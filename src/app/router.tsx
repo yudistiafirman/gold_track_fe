@@ -11,17 +11,21 @@ import { CustomerDetailPage } from '@/pages/customer-detail-page'
 import { CustomersPage } from '@/pages/customers-page'
 import { DashboardPage } from '@/pages/dashboard-page'
 import { DesignSystemPage } from '@/pages/design-system-page'
+import { ExpensesPage } from '@/pages/expenses-page'
 import { ForbiddenPage } from '@/pages/forbidden-page'
 import { LoginPage } from '@/pages/login-page'
 import { NotFoundPage } from '@/pages/not-found-page'
+import { OpnameResultPage } from '@/pages/opname-result-page'
 import { PlaceholderPage } from '@/pages/placeholder-page'
 import { ProductDetailPage } from '@/pages/product-detail-page'
 import { ProductsPage } from '@/pages/products-page'
 import { PurchaseOrderDetailPage } from '@/pages/purchase-order-detail-page'
 import { PurchaseOrdersPage } from '@/pages/purchase-orders-page'
 import { ReceivePurchaseOrderPage } from '@/pages/receive-purchase-order-page'
+import { ScanOpnamePage } from '@/pages/scan-opname-page'
 import { SellPage } from '@/pages/sell-page'
 import { SettingsPage } from '@/pages/settings-page'
+import { StartOpnamePage } from '@/pages/start-opname-page'
 import { SupplierDetailPage } from '@/pages/supplier-detail-page'
 import { SuppliersPage } from '@/pages/suppliers-page'
 import { TransactionReceiptPage } from '@/pages/transaction-receipt-page'
@@ -65,11 +69,10 @@ export const router = createBrowserRouter([
                     path: 'purchase-orders/:id/receive',
                     element: <ReceivePurchaseOrderPage />,
                   },
-                  {
-                    path: 'stock-opnames',
-                    element: <PlaceholderPage title="Stock Opname" />,
-                  },
-                  { path: 'expenses', element: <PlaceholderPage title="Pengeluaran" /> },
+                  { path: 'stock-opnames', element: <StartOpnamePage /> },
+                  { path: 'stock-opnames/:id/scan', element: <ScanOpnamePage /> },
+                  { path: 'stock-opnames/:id', element: <OpnameResultPage /> },
+                  { path: 'expenses', element: <ExpensesPage /> },
                   {
                     path: 'reports/transactions',
                     element: <PlaceholderPage title="Laporan Transaksi" />,
