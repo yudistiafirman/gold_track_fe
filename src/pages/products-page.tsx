@@ -1,64 +1,81 @@
+import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import { Pencil, Plus, Trash2 } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { DataTable } from '@/components/data-table/data-table'
-import type { DataTableColumn } from '@/components/data-table/types'
+import type { DataTableColumn, PaginationMeta } from '@/components/data-table/types'
 import { StatusBadge } from '@/components/status-badge'
 import { Button } from '@/components/ui/button'
-import { STOCK_CONDITION_TONE } from '@/lib/domain-status'
-import { paginateMock } from '@/lib/paginate-mock'
+import { useDebouncedValue } from '@/hooks/use-debounced-value'
+import { api } from '@/lib/api/client'
+import { ApiError } from '@/lib/api/error'
 import { useCan } from '@/lib/permissions'
+
+interface ProductRef {
+  id: string
+  name: string
+}
 
 interface Product {
   id: string
   name: string
   sku: string
-  category: string
-  stock: number
-  condition: keyof typeof STOCK_CONDITION_TONE
+  category: ProductRef
+  brand: ProductRef
+  weight_gram: number
+  description: string | null
+  is_active: boolean
+  created_at: string
+  updated_at: string
 }
 
-const MOCK_PRODUCTS: Product[] = [
-  { id: '1', name: 'Cincin Emas 24K', sku: 'CIN-001', category: 'Cincin', stock: 12, condition: 'GOOD' },
-  { id: '2', name: 'Kalung Emas 22K', sku: 'KAL-014', category: 'Kalung', stock: 3, condition: 'GOOD' },
-  { id: '3', name: 'Gelang Emas 18K', sku: 'GEL-007', category: 'Gelang', stock: 0, condition: 'BAD' },
-  { id: '4', name: 'Anting Emas 24K', sku: 'ANT-022', category: 'Anting', stock: 8, condition: 'GOOD' },
-  { id: '5', name: 'Liontin Emas 22K', sku: 'LIO-009', category: 'Liontin', stock: 5, condition: 'GOOD' },
-  { id: '6', name: 'Cincin Kawin 24K', sku: 'CIN-018', category: 'Cincin', stock: 2, condition: 'BAD' },
-  { id: '7', name: 'Kalung Emas 18K', sku: 'KAL-031', category: 'Kalung', stock: 10, condition: 'GOOD' },
-  { id: '8', name: 'Gelang Emas 24K', sku: 'GEL-012', category: 'Gelang', stock: 6, condition: 'GOOD' },
-]
+interface ProductListResponse {
+  items: Product[]
+  pagination: PaginationMeta
+}
 
-const PAGE_SIZE = 5
+const PAGE_SIZE = 10
 
 export function ProductsPage() {
   const [search, setSearch] = useState('')
   const [page, setPage] = useState(1)
   const navigate = useNavigate()
+  const debouncedSearch = useDebouncedValue(search, 400)
 
   const canCreate = useCan('create', 'products')
   const canUpdate = useCan('update', 'products')
   const canDelete = useCan('delete', 'products')
 
-  const filtered = useMemo(
-    () =>
-      MOCK_PRODUCTS.filter((product) =>
-        product.name.toLowerCase().includes(search.toLowerCase()),
-      ),
-    [search],
-  )
-  const { items, pagination } = paginateMock(filtered, page, PAGE_SIZE)
+  const productsQuery = useQuery({
+    queryKey: ['products', { search: debouncedSearch, page }],
+    queryFn: () =>
+      api.get<ProductListResponse>('/products', {
+        params: { search: debouncedSearch || undefined, page, limit: PAGE_SIZE },
+      }),
+    placeholderData: keepPreviousData,
+  })
 
   const columns = useMemo(() => {
     const cols: DataTableColumn<Product>[] = [
-      { id: 'name', header: 'Nama Produk', cell: (row) => row.name },
       { id: 'sku', header: 'SKU', cell: (row) => row.sku, className: 'text-table-num' },
-      { id: 'category', header: 'Kategori', cell: (row) => row.category },
-      { id: 'stock', header: 'Stok', cell: (row) => row.stock, className: 'text-table-num' },
+      { id: 'name', header: 'Nama Produk', cell: (row) => row.name },
+      { id: 'category', header: 'Kategori', cell: (row) => row.category.name },
+      { id: 'brand', header: 'Brand', cell: (row) => row.brand.name },
       {
-        id: 'condition',
-        header: 'Kondisi',
-        cell: (row) => <StatusBadge tone={STOCK_CONDITION_TONE[row.condition]} label={row.condition} />,
+        id: 'weight',
+        header: 'Berat',
+        cell: (row) => `${row.weight_gram} gr`,
+        className: 'text-table-num',
+      },
+      {
+        id: 'is_active',
+        header: 'Status',
+        cell: (row) => (
+          <StatusBadge
+            tone={row.is_active ? 'success' : 'gray'}
+            label={row.is_active ? 'Aktif' : 'Nonaktif'}
+          />
+        ),
       },
     ]
 
@@ -87,6 +104,14 @@ export function ProductsPage() {
     return cols
   }, [canUpdate, canDelete])
 
+  const isError = productsQuery.isError
+  const emptyTitle = isError ? 'Gagal memuat produk' : 'Produk tidak ditemukan'
+  const emptyDescription = isError
+    ? productsQuery.error instanceof ApiError
+      ? productsQuery.error.message
+      : 'Terjadi kesalahan, silakan coba lagi.'
+    : undefined
+
   return (
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between">
@@ -100,17 +125,19 @@ export function ProductsPage() {
       </div>
       <DataTable
         columns={columns}
-        data={items}
+        data={productsQuery.data?.items ?? []}
         getRowId={(row) => row.id}
-        pagination={pagination}
+        isLoading={productsQuery.isPending}
+        pagination={productsQuery.data?.pagination}
         onPageChange={setPage}
         search={search}
         onSearchChange={(value) => {
           setSearch(value)
           setPage(1)
         }}
-        searchPlaceholder="Cari produk..."
-        emptyTitle="Produk tidak ditemukan"
+        searchPlaceholder="Cari produk (nama/SKU)..."
+        emptyTitle={emptyTitle}
+        emptyDescription={emptyDescription}
       />
     </div>
   )
