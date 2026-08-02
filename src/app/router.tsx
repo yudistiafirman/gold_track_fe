@@ -39,7 +39,6 @@ export const router = createBrowserRouter([
                 element: <RoleGuard roles={ADMIN_ROLES} />,
                 children: [
                   { path: 'dashboard', element: <DashboardPage /> },
-                  { path: 'products/new', element: <PlaceholderPage title="Tambah Produk" /> },
                   { path: 'suppliers', element: <PlaceholderPage title="Supplier" /> },
                   {
                     path: 'gold-prices',

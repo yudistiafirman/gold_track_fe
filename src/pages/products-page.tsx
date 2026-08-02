@@ -1,33 +1,16 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import { Pencil, Plus, Trash2 } from 'lucide-react'
 import { useMemo, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { DataTable } from '@/components/data-table/data-table'
 import type { DataTableColumn, PaginationMeta } from '@/components/data-table/types'
+import { CreateProductDialog } from '@/components/products/create-product-dialog'
 import { StatusBadge } from '@/components/status-badge'
 import { Button } from '@/components/ui/button'
 import { useDebouncedValue } from '@/hooks/use-debounced-value'
 import { api } from '@/lib/api/client'
 import { ApiError } from '@/lib/api/error'
 import { useCan } from '@/lib/permissions'
-
-interface ProductRef {
-  id: string
-  name: string
-}
-
-interface Product {
-  id: string
-  name: string
-  sku: string
-  category: ProductRef
-  brand: ProductRef
-  weight_gram: number
-  description: string | null
-  is_active: boolean
-  created_at: string
-  updated_at: string
-}
+import type { Product } from '@/types/product'
 
 interface ProductListResponse {
   items: Product[]
@@ -39,7 +22,7 @@ const PAGE_SIZE = 10
 export function ProductsPage() {
   const [search, setSearch] = useState('')
   const [page, setPage] = useState(1)
-  const navigate = useNavigate()
+  const [createOpen, setCreateOpen] = useState(false)
   const debouncedSearch = useDebouncedValue(search, 400)
 
   const canCreate = useCan('create', 'products')
@@ -117,7 +100,7 @@ export function ProductsPage() {
       <div className="flex items-center justify-between">
         <h1 className="text-h1 text-gray-900">Produk</h1>
         {canCreate && (
-          <Button onClick={() => navigate('/products/new')}>
+          <Button onClick={() => setCreateOpen(true)}>
             <Plus />
             Tambah Produk
           </Button>
@@ -139,6 +122,7 @@ export function ProductsPage() {
         emptyTitle={emptyTitle}
         emptyDescription={emptyDescription}
       />
+      <CreateProductDialog open={createOpen} onOpenChange={setCreateOpen} />
     </div>
   )
 }
