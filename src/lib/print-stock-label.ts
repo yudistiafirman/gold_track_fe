@@ -10,7 +10,7 @@ function escapeHtml(value: string): string {
     .replace(/'/g, '&#39;')
 }
 
-function renderBarcodeSvg(value: string): string {
+export function renderBarcodeSvg(value: string): string {
   const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
   JsBarcode(svg, value, {
     format: 'CODE128',

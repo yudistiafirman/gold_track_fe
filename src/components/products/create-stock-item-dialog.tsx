@@ -1,7 +1,8 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Loader2, Printer } from 'lucide-react'
 import { type SubmitEvent, useState } from 'react'
 import { FormField } from '@/components/form-field'
+import { StockLabelPreview } from '@/components/products/stock-label-preview'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -29,7 +30,7 @@ import {
   type StockItemFormValues,
   validateStockItemForm,
 } from '@/lib/stock-item-validation'
-import type { StockItem } from '@/types/stock-item'
+import type { StockItem, StockItemLabel } from '@/types/stock-item'
 
 interface CreateStockItemPayload {
   serial_number: string
@@ -76,6 +77,12 @@ export function CreateStockItemDialog({
       queryClient.invalidateQueries({ queryKey: ['products', productId, 'stock-items'] })
       setCreatedItem(stockItem)
     },
+  })
+
+  const labelQuery = useQuery({
+    queryKey: ['stock-items', createdItem?.id, 'label'],
+    queryFn: () => api.get<StockItemLabel>(`/stock-items/${createdItem?.id}/label`),
+    enabled: createdItem !== null,
   })
 
   function resetForm() {
@@ -130,10 +137,12 @@ export function CreateStockItemDialog({
               </DialogDescription>
             </DialogHeader>
 
-            <div className="flex flex-col items-center gap-2 rounded-lg border border-border bg-muted/50 py-6">
-              <span className="text-caption text-gray-500">Barcode</span>
-              <span className="text-h2 tabular-nums text-gray-900">{createdItem.barcode}</span>
-              <span className="text-caption text-gray-500">SN: {createdItem.serial_number}</span>
+            <div className="flex items-center justify-center rounded-lg border border-border bg-muted/50 py-6">
+              {labelQuery.data ? (
+                <StockLabelPreview label={labelQuery.data} />
+              ) : (
+                <Loader2 className="animate-spin text-muted-foreground" />
+              )}
             </div>
 
             <DialogFooter>

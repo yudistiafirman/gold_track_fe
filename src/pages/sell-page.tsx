@@ -1,30 +1,20 @@
 import { useMutation } from '@tanstack/react-query'
-import {
-  CreditCard,
-  Landmark,
-  Loader2,
-  QrCode,
-  ScanBarcode,
-  User,
-  Wallet,
-  X,
-} from 'lucide-react'
-import { type ComponentType, useMemo, useState } from 'react'
+import { Loader2, ScanBarcode, X } from 'lucide-react'
+import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
 import { DataTable } from '@/components/data-table/data-table'
 import type { DataTableColumn } from '@/components/data-table/types'
+import { OptionToggle } from '@/components/option-toggle'
+import { PartyCard } from '@/components/party-card'
 import { BarcodeScanInput } from '@/components/sell/barcode-scan-input'
 import { ConfirmBadConditionDialog } from '@/components/sell/confirm-bad-condition-dialog'
 import { PickCustomerDialog } from '@/components/sell/pick-customer-dialog'
 import { PickSupplierDialog } from '@/components/sell/pick-supplier-dialog'
 import { StatusBadge } from '@/components/status-badge'
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import {
   Select,
   SelectContent,
@@ -36,12 +26,9 @@ import { Textarea } from '@/components/ui/textarea'
 import { api } from '@/lib/api/client'
 import { ApiError } from '@/lib/api/error'
 import { formatCurrency, formatThousands } from '@/lib/format'
+import { NON_CASH_METHODS } from '@/lib/payment-methods'
 import { showSuccessToast } from '@/lib/toast'
-import {
-  type SellCartLine,
-  type SellPartyRef,
-  useSellCartStore,
-} from '@/store/sell-cart-store'
+import { type SellCartLine, useSellCartStore } from '@/store/sell-cart-store'
 import type { StockItem } from '@/types/stock-item'
 import type { StockItemLookupResult } from '@/types/stock-item-lookup'
 import type { TransactionResult } from '@/types/transaction'
@@ -62,99 +49,9 @@ interface CheckoutPayload {
   items: CheckoutItemPayload[]
 }
 
-// No real payment-brand logos available here, so each option gets a generic
-// category icon (bank / QR / card / e-wallet) instead of fabricated logos.
-const NON_CASH_METHODS: { value: string; label: string; icon: ComponentType<{ className?: string }> }[] = [
-  { value: 'TRANSFER', label: 'Transfer Bank', icon: Landmark },
-  { value: 'QRIS', label: 'QRIS', icon: QrCode },
-  { value: 'DEBIT', label: 'Kartu Debit', icon: CreditCard },
-  { value: 'KREDIT', label: 'Kartu Kredit', icon: CreditCard },
-  { value: 'GOPAY', label: 'GoPay', icon: Wallet },
-  { value: 'OVO', label: 'OVO', icon: Wallet },
-  { value: 'DANA', label: 'DANA', icon: Wallet },
-  { value: 'SHOPEEPAY', label: 'ShopeePay', icon: Wallet },
-]
-
 function lineTotal(line: SellCartLine): number {
   const pricePerGram = Number(line.pricePerGram || 0)
   return pricePerGram * line.item.product.weight_gram
-}
-
-function initials(name: string): string {
-  return name
-    .split(' ')
-    .map((part) => part[0])
-    .slice(0, 2)
-    .join('')
-    .toUpperCase()
-}
-
-interface OptionToggleProps {
-  name: string
-  value: string
-  onValueChange: (value: string) => void
-  options: { value: string; label: string }[]
-  disabled?: boolean
-}
-
-function OptionToggle({ name, value, onValueChange, options, disabled }: OptionToggleProps) {
-  return (
-    <RadioGroup
-      value={value}
-      onValueChange={onValueChange}
-      disabled={disabled}
-      className="flex w-fit flex-row items-center gap-4"
-    >
-      {options.map((option) => (
-        <div key={option.value} className="flex items-center gap-2">
-          <RadioGroupItem value={option.value} id={`${name}-${option.value}`} />
-          <Label htmlFor={`${name}-${option.value}`} className="cursor-pointer text-caption text-gray-700">
-            {option.label}
-          </Label>
-        </div>
-      ))}
-    </RadioGroup>
-  )
-}
-
-interface PartyCardProps {
-  label: string
-  party: SellPartyRef | null
-  onPick: () => void
-  onClear: () => void
-  disabled: boolean
-}
-
-function PartyCard({ label, party, onPick, onClear, disabled }: PartyCardProps) {
-  if (!party) {
-    return (
-      <Button type="button" variant="secondary" onClick={onPick} disabled={disabled} className="w-full">
-        <User />
-        {label}
-      </Button>
-    )
-  }
-
-  return (
-    <div className="flex items-center justify-between rounded-md border border-border p-3">
-      <div className="flex items-center gap-3">
-        <Avatar>
-          <AvatarFallback>{initials(party.name)}</AvatarFallback>
-        </Avatar>
-        <p className="text-body font-medium text-gray-900">{party.name}</p>
-      </div>
-      <Button
-        type="button"
-        variant="ghost"
-        size="icon-sm"
-        aria-label="Ganti"
-        onClick={onClear}
-        disabled={disabled}
-      >
-        <X />
-      </Button>
-    </div>
-  )
 }
 
 export function SellPage() {
@@ -328,6 +225,12 @@ export function SellPage() {
       id: 'weight',
       header: 'Berat',
       cell: (line) => `${line.item.product.weight_gram} gr`,
+      className: 'text-table-num',
+    },
+    {
+      id: 'purchase_price',
+      header: 'Harga Modal',
+      cell: (line) => formatCurrency(line.item.purchase_price),
       className: 'text-table-num',
     },
     {

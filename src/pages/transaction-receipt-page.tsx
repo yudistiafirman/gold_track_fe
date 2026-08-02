@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { ArrowLeft, Printer } from 'lucide-react'
-import { Link, useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { StatusBadge } from '@/components/status-badge'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -31,6 +31,7 @@ function resolveParty(receipt: TransactionReceipt) {
 
 export function TransactionReceiptPage() {
   const { id } = useParams<{ id: string }>()
+  const navigate = useNavigate()
 
   const receiptQuery = useQuery({
     queryKey: ['transactions', id, 'receipt'],
@@ -52,11 +53,14 @@ export function TransactionReceiptPage() {
   return (
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between">
-        <Button asChild variant="ghost" size="sm" className="-ml-2 w-fit">
-          <Link to="/sell">
-            <ArrowLeft />
-            Kembali ke Penjualan
-          </Link>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="-ml-2 w-fit"
+          onClick={() => navigate(-1)}
+        >
+          <ArrowLeft />
+          Kembali
         </Button>
         {receipt && (
           <Button onClick={() => printReceipt(receipt)}>
@@ -113,7 +117,6 @@ export function TransactionReceiptPage() {
               <TableHeader>
                 <TableRow>
                   <TableHead>Produk</TableHead>
-                  <TableHead>Kondisi</TableHead>
                   <TableHead>Berat</TableHead>
                   <TableHead>Hrg/gr</TableHead>
                   <TableHead>Subtotal</TableHead>
@@ -122,15 +125,14 @@ export function TransactionReceiptPage() {
               <TableBody>
                 {receipt.items.map((item) => (
                   <TableRow key={item.stock_item_id}>
-                    <TableCell>
+                    <TableCell className="whitespace-normal">
                       <div className="flex flex-col">
                         <span className="font-medium text-gray-900">{item.product_name}</span>
-                        <span className="text-caption text-gray-500">
-                          {item.barcode} · SN: {item.serial_number}
+                        <span className="text-caption text-gray-500 break-all">
+                          SN: {item.serial_number}
                         </span>
                       </div>
                     </TableCell>
-                    <TableCell>{item.condition}</TableCell>
                     <TableCell className="text-table-num">{item.weight_gram} gr</TableCell>
                     <TableCell className="text-table-num">
                       {formatCurrency(item.price_per_gram)}

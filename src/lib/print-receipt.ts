@@ -37,8 +37,7 @@ export function printReceipt(receipt: TransactionReceipt): void {
     .map(
       (item, index) => `<tr>
         <td class="num">${index + 1}</td>
-        <td>${escapeHtml(item.product_name)}<br/><span class="muted">${escapeHtml(item.barcode)} / SN:${escapeHtml(item.serial_number)}</span></td>
-        <td class="num">${escapeHtml(item.condition)}</td>
+        <td>${escapeHtml(item.product_name)}<br/><span class="muted">SN: ${escapeHtml(item.serial_number)}</span></td>
         <td class="num">${item.weight_gram} gr</td>
         <td class="num">${formatCurrency(item.price_per_gram)}</td>
         <td class="num">${formatCurrency(item.price_total)}</td>
@@ -124,7 +123,6 @@ export function printReceipt(receipt: TransactionReceipt): void {
         <tr>
           <th class="num">No</th>
           <th>Nama Barang</th>
-          <th class="num">Kondisi</th>
           <th class="num">Berat</th>
           <th class="num">Hrg/gr</th>
           <th class="num">Subtotal</th>

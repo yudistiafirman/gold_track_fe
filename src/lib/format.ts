@@ -25,6 +25,15 @@ export function formatThousands(digits: string): string {
   return Number(digits).toLocaleString('id-ID')
 }
 
+export function initials(name: string): string {
+  return name
+    .split(' ')
+    .map((part) => part[0])
+    .slice(0, 2)
+    .join('')
+    .toUpperCase()
+}
+
 export function todayDateInputValue(): string {
   const now = new Date()
   const year = now.getFullYear()

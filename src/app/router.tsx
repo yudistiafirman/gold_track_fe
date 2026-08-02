@@ -5,6 +5,7 @@ import { RoleGuard } from '@/app/role-guard'
 import { RootLayout } from '@/app/root-layout'
 import { AppLayout } from '@/components/layout/app-layout'
 import { ADMIN_ROLES, SUPER_ADMIN_ROLES } from '@/config/nav'
+import { BuybackPage } from '@/pages/buyback-page'
 import { CustomerDetailPage } from '@/pages/customer-detail-page'
 import { CustomersPage } from '@/pages/customers-page'
 import { DashboardPage } from '@/pages/dashboard-page'
@@ -37,7 +38,7 @@ export const router = createBrowserRouter([
               { index: true, element: <IndexRedirect /> },
               { path: 'design-system', element: <DesignSystemPage /> },
               { path: 'sell', element: <SellPage /> },
-              { path: 'buyback', element: <PlaceholderPage title="Buyback" /> },
+              { path: 'buyback', element: <BuybackPage /> },
               { path: 'products', element: <ProductsPage /> },
               { path: 'products/:id', element: <ProductDetailPage /> },
               { path: 'customers', element: <CustomersPage /> },
