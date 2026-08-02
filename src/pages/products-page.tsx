@@ -1,9 +1,13 @@
+import { Pencil, Plus, Trash2 } from 'lucide-react'
 import { useMemo, useState } from 'react'
-import { StatusBadge } from '@/components/status-badge'
+import { useNavigate } from 'react-router-dom'
 import { DataTable } from '@/components/data-table/data-table'
 import type { DataTableColumn } from '@/components/data-table/types'
+import { StatusBadge } from '@/components/status-badge'
+import { Button } from '@/components/ui/button'
 import { STOCK_CONDITION_TONE } from '@/lib/domain-status'
 import { paginateMock } from '@/lib/paginate-mock'
+import { useCan } from '@/lib/permissions'
 
 interface Product {
   id: string
@@ -25,23 +29,16 @@ const MOCK_PRODUCTS: Product[] = [
   { id: '8', name: 'Gelang Emas 24K', sku: 'GEL-012', category: 'Gelang', stock: 6, condition: 'GOOD' },
 ]
 
-const columns: DataTableColumn<Product>[] = [
-  { id: 'name', header: 'Nama Produk', cell: (row) => row.name },
-  { id: 'sku', header: 'SKU', cell: (row) => row.sku, className: 'text-table-num' },
-  { id: 'category', header: 'Kategori', cell: (row) => row.category },
-  { id: 'stock', header: 'Stok', cell: (row) => row.stock, className: 'text-table-num' },
-  {
-    id: 'condition',
-    header: 'Kondisi',
-    cell: (row) => <StatusBadge tone={STOCK_CONDITION_TONE[row.condition]} label={row.condition} />,
-  },
-]
-
 const PAGE_SIZE = 5
 
 export function ProductsPage() {
   const [search, setSearch] = useState('')
   const [page, setPage] = useState(1)
+  const navigate = useNavigate()
+
+  const canCreate = useCan('create', 'products')
+  const canUpdate = useCan('update', 'products')
+  const canDelete = useCan('delete', 'products')
 
   const filtered = useMemo(
     () =>
@@ -52,9 +49,55 @@ export function ProductsPage() {
   )
   const { items, pagination } = paginateMock(filtered, page, PAGE_SIZE)
 
+  const columns = useMemo(() => {
+    const cols: DataTableColumn<Product>[] = [
+      { id: 'name', header: 'Nama Produk', cell: (row) => row.name },
+      { id: 'sku', header: 'SKU', cell: (row) => row.sku, className: 'text-table-num' },
+      { id: 'category', header: 'Kategori', cell: (row) => row.category },
+      { id: 'stock', header: 'Stok', cell: (row) => row.stock, className: 'text-table-num' },
+      {
+        id: 'condition',
+        header: 'Kondisi',
+        cell: (row) => <StatusBadge tone={STOCK_CONDITION_TONE[row.condition]} label={row.condition} />,
+      },
+    ]
+
+    if (canUpdate || canDelete) {
+      cols.push({
+        id: 'actions',
+        header: '',
+        className: 'w-0',
+        cell: (row) => (
+          <div className="flex justify-end gap-1">
+            {canUpdate && (
+              <Button variant="ghost" size="icon-sm" aria-label={`Edit ${row.name}`}>
+                <Pencil />
+              </Button>
+            )}
+            {canDelete && (
+              <Button variant="ghost" size="icon-sm" aria-label={`Hapus ${row.name}`}>
+                <Trash2 className="text-error" />
+              </Button>
+            )}
+          </div>
+        ),
+      })
+    }
+
+    return cols
+  }, [canUpdate, canDelete])
+
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="text-h1 text-gray-900">Produk</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-h1 text-gray-900">Produk</h1>
+        {canCreate && (
+          <Button onClick={() => navigate('/products/new')}>
+            <Plus />
+            Tambah Produk
+          </Button>
+        )}
+      </div>
       <DataTable
         columns={columns}
         data={items}

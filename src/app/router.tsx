@@ -34,10 +34,12 @@ export const router = createBrowserRouter([
               { path: 'buyback', element: <PlaceholderPage title="Buyback" /> },
               { path: 'products', element: <ProductsPage /> },
               { path: 'customers', element: <CustomersPage /> },
+              { path: 'customers/new', element: <PlaceholderPage title="Tambah Pelanggan" /> },
               {
                 element: <RoleGuard roles={ADMIN_ROLES} />,
                 children: [
                   { path: 'dashboard', element: <DashboardPage /> },
+                  { path: 'products/new', element: <PlaceholderPage title="Tambah Produk" /> },
                   { path: 'suppliers', element: <PlaceholderPage title="Supplier" /> },
                   {
                     path: 'gold-prices',

@@ -40,7 +40,9 @@ src/
 
 ## Konvensi penting
 
-**Auth & role.** Token + user (`id/name/email/role`) disimpan di `useAuthStore` (`src/store/auth-store.ts`), role: `ADMIN | KASIR | SUPER_ADMIN`. Route diproteksi via `ProtectedRoute` (butuh login) dan `RoleGuard` (butuh role tertentu) — lihat `src/app/router.tsx`. Menu sidebar & role guard sama-sama baca dari `src/config/nav.ts`, jangan hardcode role check di tempat lain.
+**Auth & role.** Token + user (`id/name/role`) disimpan di `useAuthStore` (`src/store/auth-store.ts`), role: `ADMIN | KASIR | SUPER_ADMIN`. Route diproteksi via `ProtectedRoute` (butuh login) dan `RoleGuard` (butuh role tertentu) — lihat `src/app/router.tsx`. Menu sidebar & role guard sama-sama baca dari `src/config/nav.ts`, jangan hardcode role check di tempat lain.
+
+**Aksi per-role (tombol create/edit/delete).** Pakai `useCan(action, resource)` dari `src/lib/permissions.ts` untuk nge-hide tombol yang role-nya nggak berhak — default-nya admin-only (`ADMIN`/`SUPER_ADMIN`), override per-resource kalau ada pengecualian (lihat contoh `customers.create` yang dibuka buat kasir). Ini cuma UX — guard sungguhannya tetap 403 dari BE, jangan andalkan ini sebagai security.
 
 **API client.** `src/lib/api/client.ts` — axios instance, base URL dari `VITE_API_BASE_URL`, auto-attach Bearer token, auto-unwrap envelope `{success,data}` / `{success:false,error:{code,message}}`. 401 → auto logout + redirect `/login`. 403 → redirect `/403`. Pakai `api.get/post/put/patch/delete`, bukan axios langsung.
 

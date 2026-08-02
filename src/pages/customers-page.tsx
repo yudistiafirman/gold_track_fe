@@ -1,7 +1,11 @@
+import { Pencil, Plus, Trash2 } from 'lucide-react'
 import { useMemo, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { DataTable } from '@/components/data-table/data-table'
 import type { DataTableColumn } from '@/components/data-table/types'
+import { Button } from '@/components/ui/button'
 import { paginateMock } from '@/lib/paginate-mock'
+import { useCan } from '@/lib/permissions'
 
 interface Customer {
   id: string
@@ -21,23 +25,16 @@ const MOCK_CUSTOMERS: Customer[] = [
   { id: '7', name: 'Yuni Kartika', phone: '0852-4433-2211', email: 'yuni@example.com', totalTransactions: 5 },
 ]
 
-const columns: DataTableColumn<Customer>[] = [
-  { id: 'name', header: 'Nama', cell: (row) => row.name },
-  { id: 'phone', header: 'Telepon', cell: (row) => row.phone, className: 'text-table-num' },
-  { id: 'email', header: 'Email', cell: (row) => row.email },
-  {
-    id: 'totalTransactions',
-    header: 'Total Transaksi',
-    cell: (row) => row.totalTransactions,
-    className: 'text-table-num',
-  },
-]
-
 const PAGE_SIZE = 5
 
 export function CustomersPage() {
   const [search, setSearch] = useState('')
   const [page, setPage] = useState(1)
+  const navigate = useNavigate()
+
+  const canCreate = useCan('create', 'customers')
+  const canUpdate = useCan('update', 'customers')
+  const canDelete = useCan('delete', 'customers')
 
   const filtered = useMemo(
     () =>
@@ -48,9 +45,55 @@ export function CustomersPage() {
   )
   const { items, pagination } = paginateMock(filtered, page, PAGE_SIZE)
 
+  const columns = useMemo(() => {
+    const cols: DataTableColumn<Customer>[] = [
+      { id: 'name', header: 'Nama', cell: (row) => row.name },
+      { id: 'phone', header: 'Telepon', cell: (row) => row.phone, className: 'text-table-num' },
+      { id: 'email', header: 'Email', cell: (row) => row.email },
+      {
+        id: 'totalTransactions',
+        header: 'Total Transaksi',
+        cell: (row) => row.totalTransactions,
+        className: 'text-table-num',
+      },
+    ]
+
+    if (canUpdate || canDelete) {
+      cols.push({
+        id: 'actions',
+        header: '',
+        className: 'w-0',
+        cell: (row) => (
+          <div className="flex justify-end gap-1">
+            {canUpdate && (
+              <Button variant="ghost" size="icon-sm" aria-label={`Edit ${row.name}`}>
+                <Pencil />
+              </Button>
+            )}
+            {canDelete && (
+              <Button variant="ghost" size="icon-sm" aria-label={`Hapus ${row.name}`}>
+                <Trash2 className="text-error" />
+              </Button>
+            )}
+          </div>
+        ),
+      })
+    }
+
+    return cols
+  }, [canUpdate, canDelete])
+
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="text-h1 text-gray-900">Pelanggan</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-h1 text-gray-900">Pelanggan</h1>
+        {canCreate && (
+          <Button onClick={() => navigate('/customers/new')}>
+            <Plus />
+            Tambah Pelanggan
+          </Button>
+        )}
+      </div>
       <DataTable
         columns={columns}
         data={items}
