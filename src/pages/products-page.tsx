@@ -128,15 +128,14 @@ export function ProductsPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-h1 text-gray-900">Produk</h1>
-        {canCreate && (
+      {canCreate && (
+        <div className="flex justify-end">
           <Button onClick={() => setCreateOpen(true)}>
             <Plus />
             Tambah Produk
           </Button>
-        )}
-      </div>
+        </div>
+      )}
       <DataTable
         columns={columns}
         data={productsQuery.data?.items ?? []}

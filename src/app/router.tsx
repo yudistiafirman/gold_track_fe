@@ -11,13 +11,18 @@ import { CustomerDetailPage } from '@/pages/customer-detail-page'
 import { CustomersPage } from '@/pages/customers-page'
 import { DashboardPage } from '@/pages/dashboard-page'
 import { DesignSystemPage } from '@/pages/design-system-page'
+import { ExpenseCategoriesPage } from '@/pages/expense-categories-page'
+import { ExpensesLayout } from '@/pages/expenses-layout'
 import { ExpensesPage } from '@/pages/expenses-page'
 import { ForbiddenPage } from '@/pages/forbidden-page'
 import { LoginPage } from '@/pages/login-page'
 import { NotFoundPage } from '@/pages/not-found-page'
 import { OpnameResultPage } from '@/pages/opname-result-page'
 import { PlaceholderPage } from '@/pages/placeholder-page'
+import { ProductBrandsPage } from '@/pages/product-brands-page'
+import { ProductCategoriesPage } from '@/pages/product-categories-page'
 import { ProductDetailPage } from '@/pages/product-detail-page'
+import { ProductsLayout } from '@/pages/products-layout'
 import { ProductsPage } from '@/pages/products-page'
 import { PurchaseOrderDetailPage } from '@/pages/purchase-order-detail-page'
 import { PurchaseOrdersPage } from '@/pages/purchase-orders-page'
@@ -49,7 +54,20 @@ export const router = createBrowserRouter([
               { path: 'design-system', element: <DesignSystemPage /> },
               { path: 'sell', element: <SellPage /> },
               { path: 'buyback', element: <BuybackPage /> },
-              { path: 'products', element: <ProductsPage /> },
+              {
+                path: 'products',
+                element: <ProductsLayout />,
+                children: [
+                  { index: true, element: <ProductsPage /> },
+                  {
+                    element: <RoleGuard roles={ADMIN_ROLES} />,
+                    children: [
+                      { path: 'categories', element: <ProductCategoriesPage /> },
+                      { path: 'brands', element: <ProductBrandsPage /> },
+                    ],
+                  },
+                ],
+              },
               { path: 'products/:id', element: <ProductDetailPage /> },
               { path: 'customers', element: <CustomersPage /> },
               { path: 'customers/:id', element: <CustomerDetailPage /> },
@@ -74,7 +92,14 @@ export const router = createBrowserRouter([
                   { path: 'stock-opnames', element: <StartOpnamePage /> },
                   { path: 'stock-opnames/:id/scan', element: <ScanOpnamePage /> },
                   { path: 'stock-opnames/:id', element: <OpnameResultPage /> },
-                  { path: 'expenses', element: <ExpensesPage /> },
+                  {
+                    path: 'expenses',
+                    element: <ExpensesLayout />,
+                    children: [
+                      { index: true, element: <ExpensesPage /> },
+                      { path: 'categories', element: <ExpenseCategoriesPage /> },
+                    ],
+                  },
                   { path: 'reports/transactions', element: <TransactionsReportPage /> },
                   {
                     path: 'reports/stock',

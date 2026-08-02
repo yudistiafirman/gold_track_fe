@@ -1,12 +1,11 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
-import { Pencil, Plus, Settings, Trash2 } from 'lucide-react'
+import { Pencil, Plus, Trash2 } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { DataTable } from '@/components/data-table/data-table'
 import type { DataTableColumn, PaginationMeta } from '@/components/data-table/types'
 import { CreateExpenseDialog } from '@/components/expenses/create-expense-dialog'
 import { DeleteExpenseDialog } from '@/components/expenses/delete-expense-dialog'
 import { EditExpenseDialog } from '@/components/expenses/edit-expense-dialog'
-import { ManageExpenseCategoriesDialog } from '@/components/expenses/manage-expense-categories-dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -35,7 +34,6 @@ export function ExpensesPage() {
   const [categoryId, setCategoryId] = useState('ALL')
   const [page, setPage] = useState(1)
   const [createOpen, setCreateOpen] = useState(false)
-  const [manageCategoriesOpen, setManageCategoriesOpen] = useState(false)
   const [editingExpenseId, setEditingExpenseId] = useState<string | null>(null)
   const [deletingExpense, setDeletingExpense] = useState<{
     id: string
@@ -116,18 +114,11 @@ export function ExpensesPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-h1 text-gray-900">Pengeluaran</h1>
-        <div className="flex items-center gap-2">
-          <Button variant="secondary" onClick={() => setManageCategoriesOpen(true)}>
-            <Settings />
-            Kelola Kategori
-          </Button>
-          <Button onClick={() => setCreateOpen(true)}>
-            <Plus />
-            Tambah Pengeluaran
-          </Button>
-        </div>
+      <div className="flex justify-end">
+        <Button onClick={() => setCreateOpen(true)}>
+          <Plus />
+          Tambah Pengeluaran
+        </Button>
       </div>
 
       <DataTable
@@ -186,10 +177,6 @@ export function ExpensesPage() {
       />
 
       <CreateExpenseDialog open={createOpen} onOpenChange={setCreateOpen} />
-      <ManageExpenseCategoriesDialog
-        open={manageCategoriesOpen}
-        onOpenChange={setManageCategoriesOpen}
-      />
       <EditExpenseDialog expenseId={editingExpenseId} onClose={() => setEditingExpenseId(null)} />
       <DeleteExpenseDialog expense={deletingExpense} onClose={() => setDeletingExpense(null)} />
     </div>
