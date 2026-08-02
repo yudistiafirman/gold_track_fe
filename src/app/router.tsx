@@ -6,6 +6,7 @@ import { RootLayout } from '@/app/root-layout'
 import { AppLayout } from '@/components/layout/app-layout'
 import { ADMIN_ROLES, SUPER_ADMIN_ROLES } from '@/config/nav'
 import { BuybackPage } from '@/pages/buyback-page'
+import { CreatePurchaseOrderPage } from '@/pages/create-purchase-order-page'
 import { CustomerDetailPage } from '@/pages/customer-detail-page'
 import { CustomersPage } from '@/pages/customers-page'
 import { DashboardPage } from '@/pages/dashboard-page'
@@ -16,6 +17,9 @@ import { NotFoundPage } from '@/pages/not-found-page'
 import { PlaceholderPage } from '@/pages/placeholder-page'
 import { ProductDetailPage } from '@/pages/product-detail-page'
 import { ProductsPage } from '@/pages/products-page'
+import { PurchaseOrderDetailPage } from '@/pages/purchase-order-detail-page'
+import { PurchaseOrdersPage } from '@/pages/purchase-orders-page'
+import { ReceivePurchaseOrderPage } from '@/pages/receive-purchase-order-page'
 import { SellPage } from '@/pages/sell-page'
 import { SettingsPage } from '@/pages/settings-page'
 import { SupplierDetailPage } from '@/pages/supplier-detail-page'
@@ -54,9 +58,12 @@ export const router = createBrowserRouter([
                     path: 'gold-prices',
                     element: <PlaceholderPage title="Harga Emas" blocked />,
                   },
+                  { path: 'purchase-orders', element: <PurchaseOrdersPage /> },
+                  { path: 'purchase-orders/new', element: <CreatePurchaseOrderPage /> },
+                  { path: 'purchase-orders/:id', element: <PurchaseOrderDetailPage /> },
                   {
-                    path: 'purchase-orders',
-                    element: <PlaceholderPage title="Purchase Order" />,
+                    path: 'purchase-orders/:id/receive',
+                    element: <ReceivePurchaseOrderPage />,
                   },
                   {
                     path: 'stock-opnames',
