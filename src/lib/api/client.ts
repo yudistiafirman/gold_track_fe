@@ -28,7 +28,9 @@ httpClient.interceptors.response.use(
   (error: AxiosError<ApiEnvelope<unknown>>) => {
     const status = error.response?.status
 
-    if (status === 401) {
+    const isLoginRequest = error.config?.url?.includes('/auth/login')
+
+    if (status === 401 && !isLoginRequest) {
       useAuthStore.getState().clearAuth()
       if (window.location.pathname !== '/login') {
         redirect('/login')
