@@ -1,5 +1,8 @@
+import { useMutation } from '@tanstack/react-query'
 import { LogOut } from 'lucide-react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { ConfirmDialog } from '@/components/confirm-dialog'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import {
   DropdownMenu,
@@ -11,6 +14,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Separator } from '@/components/ui/separator'
 import { SidebarTrigger } from '@/components/ui/sidebar'
+import { api } from '@/lib/api/client'
 import { useAuthStore } from '@/store/auth-store'
 
 function initials(name: string) {
@@ -26,11 +30,15 @@ export function Topbar() {
   const navigate = useNavigate()
   const user = useAuthStore((state) => state.user)
   const clearAuth = useAuthStore((state) => state.clearAuth)
+  const [confirmOpen, setConfirmOpen] = useState(false)
 
-  function handleLogout() {
-    clearAuth()
-    navigate('/login')
-  }
+  const logoutMutation = useMutation({
+    mutationFn: () => api.post('/auth/logout'),
+    onSettled: () => {
+      clearAuth()
+      navigate('/login', { replace: true })
+    },
+  })
 
   return (
     <header className="flex h-14 shrink-0 items-center justify-between border-b px-4">
@@ -52,13 +60,23 @@ export function Topbar() {
               {user.role}
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={handleLogout}>
+            <DropdownMenuItem onClick={() => setConfirmOpen(true)}>
               <LogOut />
               Log out
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       )}
+
+      <ConfirmDialog
+        open={confirmOpen}
+        onOpenChange={setConfirmOpen}
+        title="Keluar dari akun?"
+        description="Anda perlu login kembali untuk mengakses GoldTrack."
+        confirmLabel="Logout"
+        isLoading={logoutMutation.isPending}
+        onConfirm={() => logoutMutation.mutate()}
+      />
     </header>
   )
 }
