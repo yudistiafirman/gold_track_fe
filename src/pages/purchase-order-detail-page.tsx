@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
-import { PackageCheck, X } from 'lucide-react'
+import { ArrowLeft, PackageCheck, X } from 'lucide-react'
 import { useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { CancelPurchaseOrderDialog } from '@/components/purchase-orders/cancel-purchase-order-dialog'
 import { StatusBadge } from '@/components/status-badge'
 import { Button } from '@/components/ui/button'
@@ -22,6 +22,7 @@ import type { PurchaseOrderDetail } from '@/types/purchase-order'
 
 export function PurchaseOrderDetailPage() {
   const { id } = useParams<{ id: string }>()
+  const navigate = useNavigate()
   const [cancelling, setCancelling] = useState<{ id: string; poCode: string } | null>(null)
 
   const poQuery = useQuery({
@@ -43,6 +44,11 @@ export function PurchaseOrderDetailPage() {
 
   return (
     <div className="flex flex-col gap-6">
+      <Button variant="ghost" size="sm" className="-ml-2 w-fit" onClick={() => navigate(-1)}>
+        <ArrowLeft />
+        Kembali
+      </Button>
+
       {isLoading ? (
         <div className="flex flex-col gap-2">
           <Skeleton className="h-8 w-56" />

@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge'
 import { api } from '@/lib/api/client'
 import { ApiError } from '@/lib/api/error'
 import { formatCurrency, formatDate } from '@/lib/format'
-import type { CustomerTransaction } from '@/types/customer-transaction'
+import type { CustomerTransaction, CustomerTransactionType } from '@/types/customer-transaction'
 
 interface CustomerTransactionListResponse {
   items: CustomerTransaction[]
@@ -15,6 +15,11 @@ interface CustomerTransactionListResponse {
 }
 
 const PAGE_SIZE = 10
+
+const TYPE_LABELS: Record<CustomerTransactionType, string> = {
+  SELL: 'Penjualan',
+  BUY: 'Buyback',
+}
 
 const columns: DataTableColumn<CustomerTransaction>[] = [
   {
@@ -32,7 +37,9 @@ const columns: DataTableColumn<CustomerTransaction>[] = [
   {
     id: 'type',
     header: 'Tipe',
-    cell: (row) => <Badge variant={row.type === 'SELL' ? 'default' : 'outline'}>{row.type}</Badge>,
+    cell: (row) => (
+      <Badge variant={row.type === 'SELL' ? 'default' : 'outline'}>{TYPE_LABELS[row.type]}</Badge>
+    ),
   },
   {
     id: 'created_at',

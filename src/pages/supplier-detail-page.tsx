@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
-import { Pencil } from 'lucide-react'
+import { ArrowLeft, Pencil } from 'lucide-react'
 import { useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import { EditSupplierDialog } from '@/components/suppliers/edit-supplier-dialog'
 import { SupplierTransactionHistory } from '@/components/suppliers/supplier-transaction-history'
 import { Button } from '@/components/ui/button'
@@ -41,6 +41,12 @@ export function SupplierDetailPage() {
           </div>
         ) : (
           <div className="flex flex-col gap-1">
+            <Button asChild variant="ghost" size="sm" className="-ml-2 w-fit">
+              <Link to="/suppliers">
+                <ArrowLeft />
+                Kembali ke Supplier
+              </Link>
+            </Button>
             <div className="flex items-center gap-3">
               <h1 className="text-h1 text-gray-900">{supplier.name}</h1>
             </div>
