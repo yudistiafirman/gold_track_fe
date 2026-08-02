@@ -25,7 +25,7 @@ import type { Supplier } from '@/types/supplier'
 
 interface CreateSupplierPayload {
   name: string
-  phone: string | null
+  phone: string
   address: string | null
   notes: string | null
 }
@@ -74,7 +74,7 @@ export function CreateSupplierDialog({ open, onOpenChange }: CreateSupplierDialo
 
     createSupplierMutation.mutate({
       name: values.name.trim(),
-      phone: values.phone.trim() || null,
+      phone: values.phone.trim(),
       address: values.address.trim() || null,
       notes: values.notes.trim() || null,
     })
@@ -104,12 +104,18 @@ export function CreateSupplierDialog({ open, onOpenChange }: CreateSupplierDialo
             />
           </FormField>
 
-          <FormField label="Telepon" htmlFor="supplier-phone" description="Opsional">
+          <FormField label="No. HP" htmlFor="supplier-phone" required error={errors.phone}>
             <Input
               id="supplier-phone"
               type="tel"
+              inputMode="numeric"
               value={values.phone}
-              onChange={(event) => setValues((prev) => ({ ...prev, phone: event.target.value }))}
+              onChange={(event) =>
+                setValues((prev) => ({
+                  ...prev,
+                  phone: event.target.value.replace(/\D/g, ''),
+                }))
+              }
               disabled={createSupplierMutation.isPending}
             />
           </FormField>

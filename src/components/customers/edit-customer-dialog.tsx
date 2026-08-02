@@ -25,7 +25,7 @@ import type { Customer } from '@/types/customer'
 
 interface UpdateCustomerPayload {
   name: string
-  phone: string | null
+  phone: string
   email: string | null
   id_type: string | null
   id_number: string | null
@@ -104,7 +104,7 @@ export function EditCustomerDialog({ customerId, onClose }: EditCustomerDialogPr
 
     updateCustomerMutation.mutate({
       name: values.name.trim(),
-      phone: values.phone.trim() || null,
+      phone: values.phone.trim(),
       email: values.email.trim() || null,
       id_type: values.id_type.trim() || null,
       id_number: values.id_number.trim() || null,
@@ -147,13 +147,21 @@ export function EditCustomerDialog({ customerId, onClose }: EditCustomerDialogPr
               />
             </FormField>
 
-            <FormField label="Telepon" htmlFor="edit-customer-phone" description="Opsional">
+            <FormField
+              label="No. HP"
+              htmlFor="edit-customer-phone"
+              required
+              error={errors.phone}
+            >
               <Input
                 id="edit-customer-phone"
                 type="tel"
+                inputMode="numeric"
                 value={values.phone}
                 onChange={(event) =>
-                  setValues((prev) => (prev ? { ...prev, phone: event.target.value } : prev))
+                  setValues((prev) =>
+                    prev ? { ...prev, phone: event.target.value.replace(/\D/g, '') } : prev,
+                  )
                 }
                 disabled={updateCustomerMutation.isPending}
               />

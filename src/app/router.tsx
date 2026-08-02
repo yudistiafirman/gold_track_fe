@@ -15,9 +15,11 @@ import { NotFoundPage } from '@/pages/not-found-page'
 import { PlaceholderPage } from '@/pages/placeholder-page'
 import { ProductDetailPage } from '@/pages/product-detail-page'
 import { ProductsPage } from '@/pages/products-page'
+import { SellPage } from '@/pages/sell-page'
 import { SettingsPage } from '@/pages/settings-page'
 import { SupplierDetailPage } from '@/pages/supplier-detail-page'
 import { SuppliersPage } from '@/pages/suppliers-page'
+import { TransactionReceiptPage } from '@/pages/transaction-receipt-page'
 
 export const router = createBrowserRouter([
   {
@@ -34,12 +36,13 @@ export const router = createBrowserRouter([
             children: [
               { index: true, element: <IndexRedirect /> },
               { path: 'design-system', element: <DesignSystemPage /> },
-              { path: 'sell', element: <PlaceholderPage title="Penjualan" /> },
+              { path: 'sell', element: <SellPage /> },
               { path: 'buyback', element: <PlaceholderPage title="Buyback" /> },
               { path: 'products', element: <ProductsPage /> },
               { path: 'products/:id', element: <ProductDetailPage /> },
               { path: 'customers', element: <CustomersPage /> },
               { path: 'customers/:id', element: <CustomerDetailPage /> },
+              { path: 'transactions/:id', element: <TransactionReceiptPage /> },
               {
                 element: <RoleGuard roles={ADMIN_ROLES} />,
                 children: [

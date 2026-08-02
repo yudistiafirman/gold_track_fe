@@ -25,7 +25,7 @@ import type { Supplier } from '@/types/supplier'
 
 interface UpdateSupplierPayload {
   name: string
-  phone: string | null
+  phone: string
   address: string | null
   notes: string | null
   is_active: boolean
@@ -97,7 +97,7 @@ export function EditSupplierDialog({ supplierId, onClose }: EditSupplierDialogPr
 
     updateSupplierMutation.mutate({
       name: values.name.trim(),
-      phone: values.phone.trim() || null,
+      phone: values.phone.trim(),
       address: values.address.trim() || null,
       notes: values.notes.trim() || null,
       is_active: isActive,
@@ -142,13 +142,21 @@ export function EditSupplierDialog({ supplierId, onClose }: EditSupplierDialogPr
               />
             </FormField>
 
-            <FormField label="Telepon" htmlFor="edit-supplier-phone" description="Opsional">
+            <FormField
+              label="No. HP"
+              htmlFor="edit-supplier-phone"
+              required
+              error={errors.phone}
+            >
               <Input
                 id="edit-supplier-phone"
                 type="tel"
+                inputMode="numeric"
                 value={values.phone}
                 onChange={(event) =>
-                  setValues((prev) => (prev ? { ...prev, phone: event.target.value } : prev))
+                  setValues((prev) =>
+                    prev ? { ...prev, phone: event.target.value.replace(/\D/g, '') } : prev,
+                  )
                 }
                 disabled={updateSupplierMutation.isPending}
               />

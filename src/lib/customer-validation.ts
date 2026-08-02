@@ -10,12 +10,14 @@ export interface CustomerFormValues {
 
 export interface CustomerFormErrors {
   name?: string
+  phone?: string
 }
 
 export function validateCustomerForm(values: CustomerFormValues): CustomerFormErrors {
   const errors: CustomerFormErrors = {}
 
   if (!values.name.trim()) errors.name = 'Nama pelanggan wajib diisi'
+  if (!values.phone.trim()) errors.phone = 'No. HP wajib diisi'
 
   return errors
 }

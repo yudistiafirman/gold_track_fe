@@ -1,6 +1,6 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
-import { toast } from 'sonner'
+import { Link } from 'react-router-dom'
 import { DataTable } from '@/components/data-table/data-table'
 import type { DataTableColumn, PaginationMeta } from '@/components/data-table/types'
 import { Badge } from '@/components/ui/badge'
@@ -16,22 +16,17 @@ interface CustomerTransactionListResponse {
 
 const PAGE_SIZE = 10
 
-function handleRowClick() {
-  toast.info('Detail transaksi belum tersedia — modul transaksi belum dibangun.')
-}
-
 const columns: DataTableColumn<CustomerTransaction>[] = [
   {
     id: 'transaction_code',
     header: 'Kode Transaksi',
     cell: (row) => (
-      <button
-        type="button"
-        onClick={handleRowClick}
+      <Link
+        to={`/transactions/${row.id}`}
         className="text-table-num text-gray-900 hover:text-primary hover:underline"
       >
         {row.transaction_code}
-      </button>
+      </Link>
     ),
   },
   {

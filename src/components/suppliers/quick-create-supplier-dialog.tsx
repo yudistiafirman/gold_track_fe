@@ -14,9 +14,9 @@ import {
 import { Input } from '@/components/ui/input'
 import { api } from '@/lib/api/client'
 import { ApiError } from '@/lib/api/error'
-import type { Customer } from '@/types/customer'
+import type { Supplier } from '@/types/supplier'
 
-interface QuickCreateCustomerPayload {
+interface QuickCreateSupplierPayload {
   name: string
   phone: string
 }
@@ -26,35 +26,34 @@ interface QuickCreateFormErrors {
   phone?: string
 }
 
-interface QuickCreateCustomerDialogProps {
+interface QuickCreateSupplierDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  /** Called with the newly created customer so the caller can use it immediately (e.g. select it in an in-progress transaction). */
-  onCreated: (customer: Customer) => void
+  /** Called with the newly created supplier so the caller can use it immediately (e.g. select it in an in-progress transaction). */
+  onCreated: (supplier: Supplier) => void
 }
 
 /**
- * Minimal create flow (name + phone) meant to be dropped into the transaction
- * screen (POS/Penjualan) so a cashier doesn't have to leave the sale to
- * register a walk-in customer. Standalone and controlled — no transaction
- * state assumed here, the caller decides what to do with the created customer.
+ * Minimal create flow (name + phone), same idea as QuickCreateCustomerDialog —
+ * for picking a sell-back-to-supplier party from the POS screen without
+ * leaving the transaction.
  */
-export function QuickCreateCustomerDialog({
+export function QuickCreateSupplierDialog({
   open,
   onOpenChange,
   onCreated,
-}: QuickCreateCustomerDialogProps) {
+}: QuickCreateSupplierDialogProps) {
   const queryClient = useQueryClient()
   const [name, setName] = useState('')
   const [phone, setPhone] = useState('')
   const [errors, setErrors] = useState<QuickCreateFormErrors>({})
 
-  const createCustomerMutation = useMutation({
-    mutationFn: (payload: QuickCreateCustomerPayload) =>
-      api.post<Customer, QuickCreateCustomerPayload>('/customers', payload),
-    onSuccess: (customer) => {
-      queryClient.invalidateQueries({ queryKey: ['customers'] })
-      onCreated(customer)
+  const createSupplierMutation = useMutation({
+    mutationFn: (payload: QuickCreateSupplierPayload) =>
+      api.post<Supplier, QuickCreateSupplierPayload>('/suppliers', payload),
+    onSuccess: (supplier) => {
+      queryClient.invalidateQueries({ queryKey: ['suppliers'] })
+      onCreated(supplier)
       handleClose()
     },
   })
@@ -63,26 +62,26 @@ export function QuickCreateCustomerDialog({
     setName('')
     setPhone('')
     setErrors({})
-    createCustomerMutation.reset()
+    createSupplierMutation.reset()
     onOpenChange(false)
   }
 
   function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault()
-    if (createCustomerMutation.isPending) return
+    if (createSupplierMutation.isPending) return
 
     const validationErrors: QuickCreateFormErrors = {}
-    if (!name.trim()) validationErrors.name = 'Nama pelanggan wajib diisi'
+    if (!name.trim()) validationErrors.name = 'Nama supplier wajib diisi'
     if (!phone.trim()) validationErrors.phone = 'No. HP wajib diisi'
     setErrors(validationErrors)
     if (Object.keys(validationErrors).length > 0) return
 
-    createCustomerMutation.mutate({ name: name.trim(), phone: phone.trim() })
+    createSupplierMutation.mutate({ name: name.trim(), phone: phone.trim() })
   }
 
-  const submitErrorMessage = createCustomerMutation.isError
-    ? createCustomerMutation.error instanceof ApiError
-      ? createCustomerMutation.error.message
+  const submitErrorMessage = createSupplierMutation.isError
+    ? createSupplierMutation.error instanceof ApiError
+      ? createSupplierMutation.error.message
       : 'Terjadi kesalahan, silakan coba lagi.'
     : null
 
@@ -90,31 +89,31 @@ export function QuickCreateCustomerDialog({
     <Dialog open={open} onOpenChange={(next) => (next ? onOpenChange(next) : handleClose())}>
       <DialogContent className="sm:max-w-sm">
         <DialogHeader>
-          <DialogTitle>Pelanggan Baru</DialogTitle>
+          <DialogTitle>Supplier Baru</DialogTitle>
           <DialogDescription>
-            Tambah cepat, detail lain bisa dilengkapi nanti di halaman Pelanggan.
+            Tambah cepat, detail lain bisa dilengkapi nanti di halaman Supplier.
           </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-5">
-          <FormField label="Nama" htmlFor="quick-customer-name" required error={errors.name}>
+          <FormField label="Nama" htmlFor="quick-supplier-name" required error={errors.name}>
             <Input
-              id="quick-customer-name"
+              id="quick-supplier-name"
               autoFocus
               value={name}
               onChange={(event) => setName(event.target.value)}
-              disabled={createCustomerMutation.isPending}
+              disabled={createSupplierMutation.isPending}
             />
           </FormField>
 
-          <FormField label="No. HP" htmlFor="quick-customer-phone" required error={errors.phone}>
+          <FormField label="No. HP" htmlFor="quick-supplier-phone" required error={errors.phone}>
             <Input
-              id="quick-customer-phone"
+              id="quick-supplier-phone"
               type="tel"
               inputMode="numeric"
               value={phone}
               onChange={(event) => setPhone(event.target.value.replace(/\D/g, ''))}
-              disabled={createCustomerMutation.isPending}
+              disabled={createSupplierMutation.isPending}
             />
           </FormField>
 
@@ -132,13 +131,13 @@ export function QuickCreateCustomerDialog({
               type="button"
               variant="secondary"
               onClick={handleClose}
-              disabled={createCustomerMutation.isPending}
+              disabled={createSupplierMutation.isPending}
             >
               Batal
             </Button>
-            <Button type="submit" disabled={createCustomerMutation.isPending}>
-              {createCustomerMutation.isPending && <Loader2 className="animate-spin" />}
-              {createCustomerMutation.isPending ? 'Menyimpan...' : 'Simpan & Gunakan'}
+            <Button type="submit" disabled={createSupplierMutation.isPending}>
+              {createSupplierMutation.isPending && <Loader2 className="animate-spin" />}
+              {createSupplierMutation.isPending ? 'Menyimpan...' : 'Simpan & Gunakan'}
             </Button>
           </DialogFooter>
         </form>

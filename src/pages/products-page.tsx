@@ -149,7 +149,7 @@ export function ProductsPage() {
           setSearch(value)
           setPage(1)
         }}
-        searchPlaceholder="Cari produk (nama/SKU)..."
+        searchPlaceholder="Cari produk (nama)..."
         emptyTitle={emptyTitle}
         emptyDescription={emptyDescription}
       />

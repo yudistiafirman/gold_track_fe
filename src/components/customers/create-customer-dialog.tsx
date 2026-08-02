@@ -25,7 +25,7 @@ import type { Customer } from '@/types/customer'
 
 interface CreateCustomerPayload {
   name: string
-  phone: string | null
+  phone: string
   email: string | null
   id_type: string | null
   id_number: string | null
@@ -80,7 +80,7 @@ export function CreateCustomerDialog({ open, onOpenChange }: CreateCustomerDialo
 
     createCustomerMutation.mutate({
       name: values.name.trim(),
-      phone: values.phone.trim() || null,
+      phone: values.phone.trim(),
       email: values.email.trim() || null,
       id_type: values.id_type.trim() || null,
       id_number: values.id_number.trim() || null,
@@ -113,12 +113,18 @@ export function CreateCustomerDialog({ open, onOpenChange }: CreateCustomerDialo
             />
           </FormField>
 
-          <FormField label="Telepon" htmlFor="customer-phone" description="Opsional">
+          <FormField label="No. HP" htmlFor="customer-phone" required error={errors.phone}>
             <Input
               id="customer-phone"
               type="tel"
+              inputMode="numeric"
               value={values.phone}
-              onChange={(event) => setValues((prev) => ({ ...prev, phone: event.target.value }))}
+              onChange={(event) =>
+                setValues((prev) => ({
+                  ...prev,
+                  phone: event.target.value.replace(/\D/g, ''),
+                }))
+              }
               disabled={createCustomerMutation.isPending}
             />
           </FormField>
