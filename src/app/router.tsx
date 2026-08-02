@@ -30,6 +30,7 @@ import { SupplierDetailPage } from '@/pages/supplier-detail-page'
 import { SuppliersPage } from '@/pages/suppliers-page'
 import { TransactionReceiptPage } from '@/pages/transaction-receipt-page'
 import { TransactionsReportPage } from '@/pages/transactions-report-page'
+import { UsersPage } from '@/pages/users-page'
 
 export const router = createBrowserRouter([
   {
@@ -89,7 +90,7 @@ export const router = createBrowserRouter([
               {
                 element: <RoleGuard roles={SUPER_ADMIN_ROLES} />,
                 children: [
-                  { path: 'users', element: <PlaceholderPage title="Manajemen User" /> },
+                  { path: 'users', element: <UsersPage /> },
                 ],
               },
             ],

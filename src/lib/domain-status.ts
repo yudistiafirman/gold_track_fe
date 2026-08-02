@@ -37,6 +37,18 @@ export const TRANSACTION_STATUS_TONE = {
   COMPLETED: 'success',
 } as const satisfies Record<string, StatusTone>
 
+/** Higher privilege reads more prominent — matches the badge-color intent used across the app's tone maps. */
+export const ROLE_TONE = {
+  KASIR: 'gray',
+  ADMIN: 'warning',
+  SUPER_ADMIN: 'success',
+} as const satisfies Record<string, StatusTone>
+
+export const ACCOUNT_STATUS_TONE = {
+  AKTIF: 'success',
+  NONAKTIF: 'gray',
+} as const satisfies Record<string, StatusTone>
+
 export const LOW_STOCK_TONE: StatusTone = 'error'
 
 export type PoStatus = keyof typeof PO_STATUS_TONE
