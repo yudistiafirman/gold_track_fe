@@ -17,3 +17,10 @@ export interface StockItem {
   created_at: string
   updated_at: string
 }
+
+export interface StockItemLabel {
+  barcode: string
+  product_name: string
+  weight_gram: number
+  serial_number: string
+}

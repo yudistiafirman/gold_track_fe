@@ -1,8 +1,11 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
-import { Eye } from 'lucide-react'
+import { Eye, Loader2, Pencil, Plus, Printer, Trash2 } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { DataTable } from '@/components/data-table/data-table'
 import type { DataTableColumn, PaginationMeta } from '@/components/data-table/types'
+import { CreateStockItemDialog } from '@/components/products/create-stock-item-dialog'
+import { DeleteStockItemDialog } from '@/components/products/delete-stock-item-dialog'
+import { EditStockItemDialog } from '@/components/products/edit-stock-item-dialog'
 import { StockItemDetailDialog } from '@/components/products/stock-item-detail-dialog'
 import { StatusBadge } from '@/components/status-badge'
 import { Button } from '@/components/ui/button'
@@ -14,6 +17,10 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { useDebouncedValue } from '@/hooks/use-debounced-value'
+import {
+  usePrintStockItemLabel,
+  usePrintStockItemLabels,
+} from '@/hooks/use-print-stock-item-label'
 import { api } from '@/lib/api/client'
 import { ApiError } from '@/lib/api/error'
 import {
@@ -23,6 +30,7 @@ import {
   type StockStatus,
 } from '@/lib/domain-status'
 import { formatCurrency, formatDate } from '@/lib/format'
+import { useCan } from '@/lib/permissions'
 import type { StockItem } from '@/types/stock-item'
 
 interface StockItemListResponse {
@@ -54,7 +62,20 @@ export function StockItemsTab({ productId }: StockItemsTabProps) {
   const [condition, setCondition] = useState<StockCondition | 'ALL'>('ALL')
   const [page, setPage] = useState(1)
   const [viewingStockItemId, setViewingStockItemId] = useState<string | null>(null)
+  const [editingStockItemId, setEditingStockItemId] = useState<string | null>(null)
+  const [deletingStockItem, setDeletingStockItem] = useState<{
+    id: string
+    serialNumber: string
+    productId: string
+  } | null>(null)
+  const [createOpen, setCreateOpen] = useState(false)
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
   const debouncedSearch = useDebouncedValue(search, 400)
+  const canCreate = useCan('create', 'stock-items')
+  const canUpdate = useCan('update', 'stock-items')
+  const canDelete = useCan('delete', 'stock-items')
+  const printLabelMutation = usePrintStockItemLabel()
+  const printLabelsMutation = usePrintStockItemLabels()
 
   const stockItemsQuery = useQuery({
     queryKey: [
@@ -118,18 +139,65 @@ export function StockItemsTab({ productId }: StockItemsTabProps) {
         header: '',
         className: 'w-0',
         cell: (row) => (
-          <Button
-            variant="ghost"
-            size="icon-sm"
-            aria-label={`Lihat detail ${row.serial_number}`}
-            onClick={() => setViewingStockItemId(row.id)}
-          >
-            <Eye />
-          </Button>
+          <div className="flex justify-end gap-1">
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              aria-label={`Lihat detail ${row.serial_number}`}
+              onClick={() => setViewingStockItemId(row.id)}
+            >
+              <Eye />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              aria-label={`Cetak label ${row.serial_number}`}
+              disabled={printLabelMutation.isPending && printLabelMutation.variables === row.id}
+              onClick={() => printLabelMutation.mutate(row.id)}
+            >
+              {printLabelMutation.isPending && printLabelMutation.variables === row.id ? (
+                <Loader2 className="animate-spin" />
+              ) : (
+                <Printer />
+              )}
+            </Button>
+            {canUpdate && (
+              <Button
+                variant="ghost"
+                size="icon-sm"
+                aria-label={`Edit ${row.serial_number}`}
+                onClick={() => setEditingStockItemId(row.id)}
+              >
+                <Pencil />
+              </Button>
+            )}
+            {canDelete && (
+              <Button
+                variant="ghost"
+                size="icon-sm"
+                aria-label={`Hapus ${row.serial_number}`}
+                title={
+                  row.status !== 'AVAILABLE'
+                    ? 'Hanya unit AVAILABLE yang bisa dihapus'
+                    : undefined
+                }
+                disabled={row.status !== 'AVAILABLE'}
+                onClick={() =>
+                  setDeletingStockItem({
+                    id: row.id,
+                    serialNumber: row.serial_number,
+                    productId: row.product.id,
+                  })
+                }
+              >
+                <Trash2 className="text-error" />
+              </Button>
+            )}
+          </div>
         ),
       },
     ],
-    [],
+    [canUpdate, canDelete, printLabelMutation],
   )
 
   const isError = stockItemsQuery.isError
@@ -142,6 +210,34 @@ export function StockItemsTab({ productId }: StockItemsTabProps) {
 
   return (
     <div className="flex flex-col gap-4">
+      <div className="flex items-center justify-between">
+        <h2 className="text-h3 text-gray-900">Unit Stok</h2>
+        <div className="flex items-center gap-2">
+          {selectedIds.size > 0 && (
+            <Button
+              variant="secondary"
+              disabled={printLabelsMutation.isPending}
+              onClick={() => {
+                printLabelsMutation.mutate(Array.from(selectedIds))
+                setSelectedIds(new Set())
+              }}
+            >
+              {printLabelsMutation.isPending ? (
+                <Loader2 className="animate-spin" />
+              ) : (
+                <Printer />
+              )}
+              Cetak Label Terpilih ({selectedIds.size})
+            </Button>
+          )}
+          {canCreate && (
+            <Button onClick={() => setCreateOpen(true)}>
+              <Plus />
+              Tambah Unit Stok
+            </Button>
+          )}
+        </div>
+      </div>
       <DataTable
         columns={columns}
         data={stockItemsQuery.data?.items ?? []}
@@ -157,6 +253,8 @@ export function StockItemsTab({ productId }: StockItemsTabProps) {
         searchPlaceholder="Cari serial number..."
         emptyTitle={emptyTitle}
         emptyDescription={emptyDescription}
+        selectedIds={selectedIds}
+        onSelectedIdsChange={setSelectedIds}
         filters={
           <div className="flex gap-2">
             <Select
@@ -202,6 +300,19 @@ export function StockItemsTab({ productId }: StockItemsTabProps) {
       <StockItemDetailDialog
         stockItemId={viewingStockItemId}
         onClose={() => setViewingStockItemId(null)}
+      />
+      <EditStockItemDialog
+        stockItemId={editingStockItemId}
+        onClose={() => setEditingStockItemId(null)}
+      />
+      <DeleteStockItemDialog
+        stockItem={deletingStockItem}
+        onClose={() => setDeletingStockItem(null)}
+      />
+      <CreateStockItemDialog
+        productId={productId}
+        open={createOpen}
+        onOpenChange={setCreateOpen}
       />
     </div>
   )
