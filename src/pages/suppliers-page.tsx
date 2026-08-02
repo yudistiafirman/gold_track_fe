@@ -1,6 +1,7 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import { Pencil, Plus, Trash2 } from 'lucide-react'
 import { useMemo, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { DataTable } from '@/components/data-table/data-table'
 import type { DataTableColumn, PaginationMeta } from '@/components/data-table/types'
 import { CreateSupplierDialog } from '@/components/suppliers/create-supplier-dialog'
@@ -46,7 +47,18 @@ export function SuppliersPage() {
 
   const columns = useMemo(() => {
     const cols: DataTableColumn<Supplier>[] = [
-      { id: 'name', header: 'Nama Supplier', cell: (row) => row.name },
+      {
+        id: 'name',
+        header: 'Nama Supplier',
+        cell: (row) => (
+          <Link
+            to={`/suppliers/${row.id}`}
+            className="font-medium text-gray-900 hover:text-primary"
+          >
+            {row.name}
+          </Link>
+        ),
+      },
       {
         id: 'phone',
         header: 'Telepon',

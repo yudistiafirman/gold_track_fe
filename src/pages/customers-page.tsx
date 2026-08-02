@@ -1,61 +1,67 @@
+import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import { Pencil, Plus, Trash2 } from 'lucide-react'
 import { useMemo, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { DataTable } from '@/components/data-table/data-table'
-import type { DataTableColumn } from '@/components/data-table/types'
+import type { DataTableColumn, PaginationMeta } from '@/components/data-table/types'
+import { CreateCustomerDialog } from '@/components/customers/create-customer-dialog'
+import { DeleteCustomerDialog } from '@/components/customers/delete-customer-dialog'
+import { EditCustomerDialog } from '@/components/customers/edit-customer-dialog'
 import { Button } from '@/components/ui/button'
-import { paginateMock } from '@/lib/paginate-mock'
+import { useDebouncedValue } from '@/hooks/use-debounced-value'
+import { api } from '@/lib/api/client'
+import { ApiError } from '@/lib/api/error'
 import { useCan } from '@/lib/permissions'
+import type { Customer } from '@/types/customer'
 
-interface Customer {
-  id: string
-  name: string
-  phone: string
-  email: string
-  totalTransactions: number
+interface CustomerListResponse {
+  items: Customer[]
+  pagination: PaginationMeta
 }
 
-const MOCK_CUSTOMERS: Customer[] = [
-  { id: '1', name: 'Siti Rahma', phone: '0812-3456-7890', email: 'siti@example.com', totalTransactions: 14 },
-  { id: '2', name: 'Budi Santoso', phone: '0813-2233-4455', email: 'budi@example.com', totalTransactions: 3 },
-  { id: '3', name: 'Dewi Lestari', phone: '0857-6677-8899', email: 'dewi@example.com', totalTransactions: 27 },
-  { id: '4', name: 'Agus Wijaya', phone: '0821-1122-3344', email: 'agus@example.com', totalTransactions: 8 },
-  { id: '5', name: 'Rina Marlina', phone: '0898-5566-7788', email: 'rina@example.com', totalTransactions: 1 },
-  { id: '6', name: 'Hendra Gunawan', phone: '0811-9988-7766', email: 'hendra@example.com', totalTransactions: 19 },
-  { id: '7', name: 'Yuni Kartika', phone: '0852-4433-2211', email: 'yuni@example.com', totalTransactions: 5 },
-]
-
-const PAGE_SIZE = 5
+const PAGE_SIZE = 10
 
 export function CustomersPage() {
   const [search, setSearch] = useState('')
   const [page, setPage] = useState(1)
-  const navigate = useNavigate()
+  const [createOpen, setCreateOpen] = useState(false)
+  const [editingCustomerId, setEditingCustomerId] = useState<string | null>(null)
+  const [deletingCustomer, setDeletingCustomer] = useState<{ id: string; name: string } | null>(
+    null,
+  )
+  const debouncedSearch = useDebouncedValue(search, 400)
 
   const canCreate = useCan('create', 'customers')
   const canUpdate = useCan('update', 'customers')
   const canDelete = useCan('delete', 'customers')
 
-  const filtered = useMemo(
-    () =>
-      MOCK_CUSTOMERS.filter((customer) =>
-        customer.name.toLowerCase().includes(search.toLowerCase()),
-      ),
-    [search],
-  )
-  const { items, pagination } = paginateMock(filtered, page, PAGE_SIZE)
+  const customersQuery = useQuery({
+    queryKey: ['customers', { search: debouncedSearch, page }],
+    queryFn: () =>
+      api.get<CustomerListResponse>('/customers', {
+        params: { search: debouncedSearch || undefined, page, limit: PAGE_SIZE },
+      }),
+    placeholderData: keepPreviousData,
+  })
 
   const columns = useMemo(() => {
     const cols: DataTableColumn<Customer>[] = [
-      { id: 'name', header: 'Nama', cell: (row) => row.name },
-      { id: 'phone', header: 'Telepon', cell: (row) => row.phone, className: 'text-table-num' },
-      { id: 'email', header: 'Email', cell: (row) => row.email },
       {
-        id: 'totalTransactions',
-        header: 'Total Transaksi',
-        cell: (row) => row.totalTransactions,
+        id: 'name',
+        header: 'Nama',
+        cell: (row) => (
+          <Link to={`/customers/${row.id}`} className="font-medium text-gray-900 hover:text-primary">
+            {row.name}
+          </Link>
+        ),
+      },
+      {
+        id: 'phone',
+        header: 'Telepon',
+        cell: (row) => row.phone ?? '—',
         className: 'text-table-num',
       },
+      { id: 'email', header: 'Email', cell: (row) => row.email ?? '—' },
     ]
 
     if (canUpdate || canDelete) {
@@ -66,12 +72,22 @@ export function CustomersPage() {
         cell: (row) => (
           <div className="flex justify-end gap-1">
             {canUpdate && (
-              <Button variant="ghost" size="icon-sm" aria-label={`Edit ${row.name}`}>
+              <Button
+                variant="ghost"
+                size="icon-sm"
+                aria-label={`Edit ${row.name}`}
+                onClick={() => setEditingCustomerId(row.id)}
+              >
                 <Pencil />
               </Button>
             )}
             {canDelete && (
-              <Button variant="ghost" size="icon-sm" aria-label={`Hapus ${row.name}`}>
+              <Button
+                variant="ghost"
+                size="icon-sm"
+                aria-label={`Hapus ${row.name}`}
+                onClick={() => setDeletingCustomer({ id: row.id, name: row.name })}
+              >
                 <Trash2 className="text-error" />
               </Button>
             )}
@@ -83,12 +99,20 @@ export function CustomersPage() {
     return cols
   }, [canUpdate, canDelete])
 
+  const isError = customersQuery.isError
+  const emptyTitle = isError ? 'Gagal memuat pelanggan' : 'Pelanggan tidak ditemukan'
+  const emptyDescription = isError
+    ? customersQuery.error instanceof ApiError
+      ? customersQuery.error.message
+      : 'Terjadi kesalahan, silakan coba lagi.'
+    : undefined
+
   return (
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between">
         <h1 className="text-h1 text-gray-900">Pelanggan</h1>
         {canCreate && (
-          <Button onClick={() => navigate('/customers/new')}>
+          <Button onClick={() => setCreateOpen(true)}>
             <Plus />
             Tambah Pelanggan
           </Button>
@@ -96,17 +120,28 @@ export function CustomersPage() {
       </div>
       <DataTable
         columns={columns}
-        data={items}
+        data={customersQuery.data?.items ?? []}
         getRowId={(row) => row.id}
-        pagination={pagination}
+        isLoading={customersQuery.isPending}
+        pagination={customersQuery.data?.pagination}
         onPageChange={setPage}
         search={search}
         onSearchChange={(value) => {
           setSearch(value)
           setPage(1)
         }}
-        searchPlaceholder="Cari pelanggan..."
-        emptyTitle="Pelanggan tidak ditemukan"
+        searchPlaceholder="Cari nama/HP..."
+        emptyTitle={emptyTitle}
+        emptyDescription={emptyDescription}
+      />
+      <CreateCustomerDialog open={createOpen} onOpenChange={setCreateOpen} />
+      <EditCustomerDialog
+        customerId={editingCustomerId}
+        onClose={() => setEditingCustomerId(null)}
+      />
+      <DeleteCustomerDialog
+        customer={deletingCustomer}
+        onClose={() => setDeletingCustomer(null)}
       />
     </div>
   )

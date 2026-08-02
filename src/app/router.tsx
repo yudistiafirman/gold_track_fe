@@ -5,6 +5,7 @@ import { RoleGuard } from '@/app/role-guard'
 import { RootLayout } from '@/app/root-layout'
 import { AppLayout } from '@/components/layout/app-layout'
 import { ADMIN_ROLES, SUPER_ADMIN_ROLES } from '@/config/nav'
+import { CustomerDetailPage } from '@/pages/customer-detail-page'
 import { CustomersPage } from '@/pages/customers-page'
 import { DashboardPage } from '@/pages/dashboard-page'
 import { DesignSystemPage } from '@/pages/design-system-page'
@@ -15,6 +16,7 @@ import { PlaceholderPage } from '@/pages/placeholder-page'
 import { ProductDetailPage } from '@/pages/product-detail-page'
 import { ProductsPage } from '@/pages/products-page'
 import { SettingsPage } from '@/pages/settings-page'
+import { SupplierDetailPage } from '@/pages/supplier-detail-page'
 import { SuppliersPage } from '@/pages/suppliers-page'
 
 export const router = createBrowserRouter([
@@ -37,12 +39,13 @@ export const router = createBrowserRouter([
               { path: 'products', element: <ProductsPage /> },
               { path: 'products/:id', element: <ProductDetailPage /> },
               { path: 'customers', element: <CustomersPage /> },
-              { path: 'customers/new', element: <PlaceholderPage title="Tambah Pelanggan" /> },
+              { path: 'customers/:id', element: <CustomerDetailPage /> },
               {
                 element: <RoleGuard roles={ADMIN_ROLES} />,
                 children: [
                   { path: 'dashboard', element: <DashboardPage /> },
                   { path: 'suppliers', element: <SuppliersPage /> },
+                  { path: 'suppliers/:id', element: <SupplierDetailPage /> },
                   {
                     path: 'gold-prices',
                     element: <PlaceholderPage title="Harga Emas" blocked />,
