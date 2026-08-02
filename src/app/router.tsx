@@ -29,6 +29,7 @@ import { StartOpnamePage } from '@/pages/start-opname-page'
 import { SupplierDetailPage } from '@/pages/supplier-detail-page'
 import { SuppliersPage } from '@/pages/suppliers-page'
 import { TransactionReceiptPage } from '@/pages/transaction-receipt-page'
+import { TransactionsReportPage } from '@/pages/transactions-report-page'
 
 export const router = createBrowserRouter([
   {
@@ -73,10 +74,7 @@ export const router = createBrowserRouter([
                   { path: 'stock-opnames/:id/scan', element: <ScanOpnamePage /> },
                   { path: 'stock-opnames/:id', element: <OpnameResultPage /> },
                   { path: 'expenses', element: <ExpensesPage /> },
-                  {
-                    path: 'reports/transactions',
-                    element: <PlaceholderPage title="Laporan Transaksi" />,
-                  },
+                  { path: 'reports/transactions', element: <TransactionsReportPage /> },
                   {
                     path: 'reports/stock',
                     element: <PlaceholderPage title="Laporan Stok" />,
