@@ -1,81 +1,70 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import { Pencil, Plus, Trash2 } from 'lucide-react'
 import { useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
 import { DataTable } from '@/components/data-table/data-table'
 import type { DataTableColumn, PaginationMeta } from '@/components/data-table/types'
-import { ArchiveProductDialog } from '@/components/products/archive-product-dialog'
-import { CreateProductDialog } from '@/components/products/create-product-dialog'
-import { EditProductDialog } from '@/components/products/edit-product-dialog'
+import { CreateSupplierDialog } from '@/components/suppliers/create-supplier-dialog'
+import { DeleteSupplierDialog } from '@/components/suppliers/delete-supplier-dialog'
+import { EditSupplierDialog } from '@/components/suppliers/edit-supplier-dialog'
 import { Button } from '@/components/ui/button'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { useDebouncedValue } from '@/hooks/use-debounced-value'
 import { api } from '@/lib/api/client'
 import { ApiError } from '@/lib/api/error'
 import { useCan } from '@/lib/permissions'
-import type { Product } from '@/types/product'
+import type { Supplier } from '@/types/supplier'
 
-interface ProductListResponse {
-  items: Product[]
+interface SupplierListResponse {
+  items: Supplier[]
   pagination: PaginationMeta
 }
 
 const PAGE_SIZE = 10
 
-export function ProductsPage() {
+export function SuppliersPage() {
   const [search, setSearch] = useState('')
   const [page, setPage] = useState(1)
   const [createOpen, setCreateOpen] = useState(false)
-  const [editingProductId, setEditingProductId] = useState<string | null>(null)
-  const [archivingProduct, setArchivingProduct] = useState<{ id: string; name: string } | null>(
+  const [editingSupplierId, setEditingSupplierId] = useState<string | null>(null)
+  const [deletingSupplier, setDeletingSupplier] = useState<{ id: string; name: string } | null>(
     null,
   )
   const debouncedSearch = useDebouncedValue(search, 400)
 
-  const canCreate = useCan('create', 'products')
-  const canUpdate = useCan('update', 'products')
-  const canDelete = useCan('delete', 'products')
+  const canCreate = useCan('create', 'suppliers')
+  const canUpdate = useCan('update', 'suppliers')
+  const canDelete = useCan('delete', 'suppliers')
 
-  const productsQuery = useQuery({
-    queryKey: ['products', { search: debouncedSearch, page }],
+  const suppliersQuery = useQuery({
+    queryKey: ['suppliers', { search: debouncedSearch, page }],
     queryFn: () =>
-      api.get<ProductListResponse>('/products', {
+      api.get<SupplierListResponse>('/suppliers', {
         params: { search: debouncedSearch || undefined, page, limit: PAGE_SIZE },
       }),
     placeholderData: keepPreviousData,
   })
 
   const columns = useMemo(() => {
-    const cols: DataTableColumn<Product>[] = [
-      { id: 'sku', header: 'SKU', cell: (row) => row.sku, className: 'text-table-num' },
+    const cols: DataTableColumn<Supplier>[] = [
+      { id: 'name', header: 'Nama Supplier', cell: (row) => row.name },
       {
-        id: 'name',
-        header: 'Nama Produk',
-        cell: (row) => (
-          <Link to={`/products/${row.id}`} className="font-medium text-gray-900 hover:text-primary">
-            {row.name}
-          </Link>
-        ),
-      },
-      { id: 'category', header: 'Kategori', cell: (row) => row.category.name },
-      { id: 'brand', header: 'Brand', cell: (row) => row.brand.name },
-      {
-        id: 'weight',
-        header: 'Berat',
-        cell: (row) => `${row.weight_gram} gr`,
+        id: 'phone',
+        header: 'Telepon',
+        cell: (row) => row.phone ?? '—',
         className: 'text-table-num',
       },
+      { id: 'address', header: 'Alamat', cell: (row) => row.address ?? '—' },
       {
-        id: 'description',
-        header: 'Deskripsi',
+        id: 'notes',
+        header: 'Catatan',
         className: 'max-w-50',
         cell: (row) =>
-          row.description ? (
+          row.notes ? (
             <Tooltip>
               <TooltipTrigger asChild>
-                <span className="block truncate">{row.description}</span>
+                <span className="block truncate">{row.notes}</span>
               </TooltipTrigger>
-              <TooltipContent>{row.description}</TooltipContent>
+              <TooltipContent>{row.notes}</TooltipContent>
             </Tooltip>
           ) : (
             '—'
@@ -95,7 +84,7 @@ export function ProductsPage() {
                 variant="ghost"
                 size="icon-sm"
                 aria-label={`Edit ${row.name}`}
-                onClick={() => setEditingProductId(row.id)}
+                onClick={() => setEditingSupplierId(row.id)}
               >
                 <Pencil />
               </Button>
@@ -104,8 +93,8 @@ export function ProductsPage() {
               <Button
                 variant="ghost"
                 size="icon-sm"
-                aria-label={`Arsipkan ${row.name}`}
-                onClick={() => setArchivingProduct({ id: row.id, name: row.name })}
+                aria-label={`Hapus ${row.name}`}
+                onClick={() => setDeletingSupplier({ id: row.id, name: row.name })}
               >
                 <Trash2 className="text-error" />
               </Button>
@@ -118,49 +107,49 @@ export function ProductsPage() {
     return cols
   }, [canUpdate, canDelete])
 
-  const isError = productsQuery.isError
-  const emptyTitle = isError ? 'Gagal memuat produk' : 'Produk tidak ditemukan'
+  const isError = suppliersQuery.isError
+  const emptyTitle = isError ? 'Gagal memuat supplier' : 'Supplier tidak ditemukan'
   const emptyDescription = isError
-    ? productsQuery.error instanceof ApiError
-      ? productsQuery.error.message
+    ? suppliersQuery.error instanceof ApiError
+      ? suppliersQuery.error.message
       : 'Terjadi kesalahan, silakan coba lagi.'
     : undefined
 
   return (
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-h1 text-gray-900">Produk</h1>
+        <h1 className="text-h1 text-gray-900">Supplier</h1>
         {canCreate && (
           <Button onClick={() => setCreateOpen(true)}>
             <Plus />
-            Tambah Produk
+            Tambah Supplier
           </Button>
         )}
       </div>
       <DataTable
         columns={columns}
-        data={productsQuery.data?.items ?? []}
+        data={suppliersQuery.data?.items ?? []}
         getRowId={(row) => row.id}
-        isLoading={productsQuery.isPending}
-        pagination={productsQuery.data?.pagination}
+        isLoading={suppliersQuery.isPending}
+        pagination={suppliersQuery.data?.pagination}
         onPageChange={setPage}
         search={search}
         onSearchChange={(value) => {
           setSearch(value)
           setPage(1)
         }}
-        searchPlaceholder="Cari produk (nama/SKU)..."
+        searchPlaceholder="Cari supplier..."
         emptyTitle={emptyTitle}
         emptyDescription={emptyDescription}
       />
-      <CreateProductDialog open={createOpen} onOpenChange={setCreateOpen} />
-      <EditProductDialog
-        productId={editingProductId}
-        onClose={() => setEditingProductId(null)}
+      <CreateSupplierDialog open={createOpen} onOpenChange={setCreateOpen} />
+      <EditSupplierDialog
+        supplierId={editingSupplierId}
+        onClose={() => setEditingSupplierId(null)}
       />
-      <ArchiveProductDialog
-        product={archivingProduct}
-        onClose={() => setArchivingProduct(null)}
+      <DeleteSupplierDialog
+        supplier={deletingSupplier}
+        onClose={() => setDeletingSupplier(null)}
       />
     </div>
   )

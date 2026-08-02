@@ -3,11 +3,14 @@ import { RouterProvider } from 'react-router-dom'
 import { queryClient } from '@/app/query-client'
 import { router } from '@/app/router'
 import { Toaster } from '@/components/ui/sonner'
+import { TooltipProvider } from '@/components/ui/tooltip'
 
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <RouterProvider router={router} />
+      <TooltipProvider>
+        <RouterProvider router={router} />
+      </TooltipProvider>
       <Toaster />
     </QueryClientProvider>
   )

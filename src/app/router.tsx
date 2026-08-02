@@ -12,8 +12,10 @@ import { ForbiddenPage } from '@/pages/forbidden-page'
 import { LoginPage } from '@/pages/login-page'
 import { NotFoundPage } from '@/pages/not-found-page'
 import { PlaceholderPage } from '@/pages/placeholder-page'
+import { ProductDetailPage } from '@/pages/product-detail-page'
 import { ProductsPage } from '@/pages/products-page'
 import { SettingsPage } from '@/pages/settings-page'
+import { SuppliersPage } from '@/pages/suppliers-page'
 
 export const router = createBrowserRouter([
   {
@@ -33,13 +35,14 @@ export const router = createBrowserRouter([
               { path: 'sell', element: <PlaceholderPage title="Penjualan" /> },
               { path: 'buyback', element: <PlaceholderPage title="Buyback" /> },
               { path: 'products', element: <ProductsPage /> },
+              { path: 'products/:id', element: <ProductDetailPage /> },
               { path: 'customers', element: <CustomersPage /> },
               { path: 'customers/new', element: <PlaceholderPage title="Tambah Pelanggan" /> },
               {
                 element: <RoleGuard roles={ADMIN_ROLES} />,
                 children: [
                   { path: 'dashboard', element: <DashboardPage /> },
-                  { path: 'suppliers', element: <PlaceholderPage title="Supplier" /> },
+                  { path: 'suppliers', element: <SuppliersPage /> },
                   {
                     path: 'gold-prices',
                     element: <PlaceholderPage title="Harga Emas" blocked />,

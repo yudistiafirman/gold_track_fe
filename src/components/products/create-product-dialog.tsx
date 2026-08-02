@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Loader2 } from 'lucide-react'
 import { type SubmitEvent, useState } from 'react'
 import { FormField } from '@/components/form-field'
@@ -20,26 +20,12 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
+import { useProductLookups } from '@/hooks/use-product-lookups'
 import { api } from '@/lib/api/client'
 import { ApiError } from '@/lib/api/error'
+import { type ProductFormValues, validateProductForm } from '@/lib/product-validation'
 import { showSuccessToast } from '@/lib/toast'
-import type { LookupItem } from '@/types/lookup'
 import type { Product } from '@/types/product'
-
-interface FormValues {
-  name: string
-  category_id: string
-  brand_id: string
-  weight_gram: string
-  description: string
-}
-
-interface FormErrors {
-  name?: string
-  category_id?: string
-  brand_id?: string
-  weight_gram?: string
-}
 
 interface CreateProductPayload {
   name: string
@@ -49,29 +35,12 @@ interface CreateProductPayload {
   description: string | null
 }
 
-const INITIAL_VALUES: FormValues = {
+const INITIAL_VALUES: ProductFormValues = {
   name: '',
   category_id: '',
   brand_id: '',
   weight_gram: '',
   description: '',
-}
-
-function validate(values: FormValues): FormErrors {
-  const errors: FormErrors = {}
-
-  if (!values.name.trim()) errors.name = 'Nama produk wajib diisi'
-  if (!values.category_id) errors.category_id = 'Kategori wajib dipilih'
-  if (!values.brand_id) errors.brand_id = 'Brand wajib dipilih'
-
-  const weight = Number(values.weight_gram)
-  if (!values.weight_gram.trim()) {
-    errors.weight_gram = 'Berat wajib diisi'
-  } else if (Number.isNaN(weight) || weight <= 0) {
-    errors.weight_gram = 'Berat harus berupa angka lebih dari 0'
-  }
-
-  return errors
 }
 
 interface CreateProductDialogProps {
@@ -81,19 +50,10 @@ interface CreateProductDialogProps {
 
 export function CreateProductDialog({ open, onOpenChange }: CreateProductDialogProps) {
   const queryClient = useQueryClient()
-  const [values, setValues] = useState<FormValues>(INITIAL_VALUES)
-  const [errors, setErrors] = useState<FormErrors>({})
+  const [values, setValues] = useState<ProductFormValues>(INITIAL_VALUES)
+  const [errors, setErrors] = useState<ReturnType<typeof validateProductForm>>({})
 
-  const categoriesQuery = useQuery({
-    queryKey: ['categories'],
-    queryFn: () => api.get<LookupItem[]>('/categories'),
-    enabled: open,
-  })
-  const brandsQuery = useQuery({
-    queryKey: ['brands'],
-    queryFn: () => api.get<LookupItem[]>('/brands'),
-    enabled: open,
-  })
+  const { categories, brands, isLoading: lookupsLoading } = useProductLookups(open)
 
   const createProductMutation = useMutation({
     mutationFn: (payload: CreateProductPayload) =>
@@ -116,7 +76,7 @@ export function CreateProductDialog({ open, onOpenChange }: CreateProductDialogP
     event.preventDefault()
     if (createProductMutation.isPending) return
 
-    const validationErrors = validate(values)
+    const validationErrors = validateProductForm(values)
     setErrors(validationErrors)
     if (Object.keys(validationErrors).length > 0) return
 
@@ -134,9 +94,6 @@ export function CreateProductDialog({ open, onOpenChange }: CreateProductDialogP
       ? createProductMutation.error.message
       : 'Terjadi kesalahan, silakan coba lagi.'
     : null
-
-  const activeCategories = (categoriesQuery.data ?? []).filter((item) => item.is_active)
-  const activeBrands = (brandsQuery.data ?? []).filter((item) => item.is_active)
 
   return (
     <Dialog open={open} onOpenChange={(next) => (next ? onOpenChange(next) : handleClose())}>
@@ -167,13 +124,13 @@ export function CreateProductDialog({ open, onOpenChange }: CreateProductDialogP
             <Select
               value={values.category_id}
               onValueChange={(value) => setValues((prev) => ({ ...prev, category_id: value }))}
-              disabled={createProductMutation.isPending || categoriesQuery.isPending}
+              disabled={createProductMutation.isPending || lookupsLoading}
             >
               <SelectTrigger id="product-category" className="w-full">
                 <SelectValue placeholder="Pilih kategori" />
               </SelectTrigger>
               <SelectContent>
-                {activeCategories.map((category) => (
+                {categories.map((category) => (
                   <SelectItem key={category.id} value={category.id}>
                     {category.name}
                   </SelectItem>
@@ -186,13 +143,13 @@ export function CreateProductDialog({ open, onOpenChange }: CreateProductDialogP
             <Select
               value={values.brand_id}
               onValueChange={(value) => setValues((prev) => ({ ...prev, brand_id: value }))}
-              disabled={createProductMutation.isPending || brandsQuery.isPending}
+              disabled={createProductMutation.isPending || lookupsLoading}
             >
               <SelectTrigger id="product-brand" className="w-full">
                 <SelectValue placeholder="Pilih brand" />
               </SelectTrigger>
               <SelectContent>
-                {activeBrands.map((brand) => (
+                {brands.map((brand) => (
                   <SelectItem key={brand.id} value={brand.id}>
                     {brand.name}
                   </SelectItem>
