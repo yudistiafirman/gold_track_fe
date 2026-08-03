@@ -19,7 +19,6 @@ import { ForbiddenPage } from '@/pages/forbidden-page'
 import { LoginPage } from '@/pages/login-page'
 import { NotFoundPage } from '@/pages/not-found-page'
 import { OpnameResultPage } from '@/pages/opname-result-page'
-import { PlaceholderPage } from '@/pages/placeholder-page'
 import { ProductBrandsPage } from '@/pages/product-brands-page'
 import { ProductCategoriesPage } from '@/pages/product-categories-page'
 import { ProductDetailPage } from '@/pages/product-detail-page'
@@ -80,10 +79,6 @@ export const router = createBrowserRouter([
                   { path: 'dashboard', element: <DashboardPage /> },
                   { path: 'suppliers', element: <SuppliersPage /> },
                   { path: 'suppliers/:id', element: <SupplierDetailPage /> },
-                  {
-                    path: 'gold-prices',
-                    element: <PlaceholderPage title="Harga Emas" blocked />,
-                  },
                   { path: 'purchase-orders', element: <PurchaseOrdersPage /> },
                   { path: 'purchase-orders/new', element: <CreatePurchaseOrderPage /> },
                   { path: 'purchase-orders/:id', element: <PurchaseOrderDetailPage /> },

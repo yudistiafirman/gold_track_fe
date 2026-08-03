@@ -3,6 +3,7 @@ import { LogOut } from 'lucide-react'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ConfirmDialog } from '@/components/confirm-dialog'
+import { GoldPriceBadge } from '@/components/layout/gold-price-badge'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import {
   DropdownMenu,
@@ -42,9 +43,10 @@ export function Topbar() {
 
   return (
     <header className="flex h-14 shrink-0 items-center justify-between border-b px-4">
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-3">
         <SidebarTrigger />
         <Separator orientation="vertical" className="h-6" />
+        <GoldPriceBadge />
       </div>
 
       {user && (

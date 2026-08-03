@@ -1,7 +1,6 @@
 import {
   ClipboardCheck,
   ClipboardList,
-  Coins,
   FileBarChart,
   LayoutDashboard,
   type LucideIcon,
@@ -70,13 +69,6 @@ export const NAV_SECTIONS: NavSection[] = [
       { type: 'link', title: 'Produk', url: '/products', icon: Package, roles: ALL_ROLES },
       { type: 'link', title: 'Pelanggan', url: '/customers', icon: Users, roles: ALL_ROLES },
       { type: 'link', title: 'Supplier', url: '/suppliers', icon: Truck, roles: ADMIN_ROLES },
-      {
-        type: 'link',
-        title: 'Harga Emas',
-        url: '/gold-prices',
-        icon: Coins,
-        roles: ADMIN_ROLES,
-      },
     ],
   },
   {
