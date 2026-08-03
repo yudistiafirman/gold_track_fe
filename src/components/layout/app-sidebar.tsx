@@ -101,7 +101,7 @@ export function AppSidebar() {
           <div className="flex size-6 items-center justify-center rounded-md bg-primary text-primary-foreground text-xs font-semibold">
             GT
           </div>
-          <span className="font-semibold">Gold Track</span>
+          <span className="font-semibold group-data-[collapsible=icon]:hidden">Gold Track</span>
         </div>
       </SidebarHeader>
       <SidebarContent>

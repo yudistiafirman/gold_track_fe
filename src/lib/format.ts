@@ -8,6 +8,17 @@ export function formatCurrency(value: number): string {
   return currencyFormatter.format(value)
 }
 
+const compactCurrencyFormatter = new Intl.NumberFormat('id-ID', {
+  style: 'currency',
+  currency: 'IDR',
+  notation: 'compact',
+  maximumFractionDigits: 1,
+})
+
+export function formatCompactCurrency(value: number): string {
+  return compactCurrencyFormatter.format(value)
+}
+
 const dateFormatter = new Intl.DateTimeFormat('id-ID', {
   day: 'numeric',
   month: 'short',
@@ -40,4 +51,11 @@ export function todayDateInputValue(): string {
   const month = String(now.getMonth() + 1).padStart(2, '0')
   const day = String(now.getDate()).padStart(2, '0')
   return `${year}-${month}-${day}`
+}
+
+export function firstDayOfMonthInputValue(): string {
+  const now = new Date()
+  const year = now.getFullYear()
+  const month = String(now.getMonth() + 1).padStart(2, '0')
+  return `${year}-${month}-01`
 }

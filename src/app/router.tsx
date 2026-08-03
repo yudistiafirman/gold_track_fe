@@ -14,6 +14,7 @@ import { DesignSystemPage } from '@/pages/design-system-page'
 import { ExpenseCategoriesPage } from '@/pages/expense-categories-page'
 import { ExpensesLayout } from '@/pages/expenses-layout'
 import { ExpensesPage } from '@/pages/expenses-page'
+import { FinanceReportPage } from '@/pages/finance-report-page'
 import { ForbiddenPage } from '@/pages/forbidden-page'
 import { LoginPage } from '@/pages/login-page'
 import { NotFoundPage } from '@/pages/not-found-page'
@@ -31,6 +32,7 @@ import { ScanOpnamePage } from '@/pages/scan-opname-page'
 import { SellPage } from '@/pages/sell-page'
 import { SettingsPage } from '@/pages/settings-page'
 import { StartOpnamePage } from '@/pages/start-opname-page'
+import { StockReportPage } from '@/pages/stock-report-page'
 import { SupplierDetailPage } from '@/pages/supplier-detail-page'
 import { SuppliersPage } from '@/pages/suppliers-page'
 import { TransactionReceiptPage } from '@/pages/transaction-receipt-page'
@@ -101,14 +103,8 @@ export const router = createBrowserRouter([
                     ],
                   },
                   { path: 'reports/transactions', element: <TransactionsReportPage /> },
-                  {
-                    path: 'reports/stock',
-                    element: <PlaceholderPage title="Laporan Stok" />,
-                  },
-                  {
-                    path: 'reports/finance',
-                    element: <PlaceholderPage title="Laporan Keuangan" />,
-                  },
+                  { path: 'reports/stock', element: <StockReportPage /> },
+                  { path: 'reports/finance', element: <FinanceReportPage /> },
                   { path: 'settings', element: <SettingsPage /> },
                 ],
               },

@@ -50,7 +50,7 @@ export function PickProductDialog({ open, onOpenChange, onSelect }: PickProductD
             autoFocus
             value={search}
             onChange={(event) => setSearch(event.target.value)}
-            placeholder="Cari nama/SKU produk..."
+            placeholder="Cari nama produk..."
             className="pl-8"
           />
         </div>

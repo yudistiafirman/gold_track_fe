@@ -23,7 +23,12 @@ import {
 import { api } from '@/lib/api/client'
 import { ApiError } from '@/lib/api/error'
 import { downloadCsv } from '@/lib/csv'
-import { formatCurrency, todayDateInputValue } from '@/lib/format'
+import { firstDayOfMonthInputValue, formatCurrency, todayDateInputValue } from '@/lib/format'
+import {
+  TRANSACTION_TYPE_BADGE_CLASSES as TYPE_BADGE_CLASSES,
+  TRANSACTION_TYPE_BAR_CLASSES as TYPE_BAR_CLASSES,
+  TRANSACTION_TYPE_LABELS as TYPE_LABELS,
+} from '@/lib/transaction-type'
 import { cn } from '@/lib/utils'
 import type { TransactionReport, TransactionReportType } from '@/types/transaction-report'
 
@@ -33,31 +38,6 @@ const TYPE_OPTIONS: { value: TransactionReportType | 'ALL'; label: string }[] = 
   { value: 'BUY', label: 'Buyback' },
   { value: 'SELL_SUPPLIER', label: 'Jual ke Supplier' },
 ]
-
-const TYPE_LABELS: Record<TransactionReportType, string> = {
-  SELL: 'Penjualan',
-  BUY: 'Buyback',
-  SELL_SUPPLIER: 'Jual ke Supplier',
-}
-
-const TYPE_BADGE_CLASSES: Record<TransactionReportType, string> = {
-  SELL: 'bg-green-100 text-green-700',
-  BUY: 'bg-blue-100 text-blue-700',
-  SELL_SUPPLIER: 'bg-pink-100 text-pink-700',
-}
-
-const TYPE_BAR_CLASSES: Record<TransactionReportType, string> = {
-  SELL: 'bg-green-500',
-  BUY: 'bg-blue-500',
-  SELL_SUPPLIER: 'bg-pink-500',
-}
-
-function firstDayOfMonthInputValue(): string {
-  const now = new Date()
-  const year = now.getFullYear()
-  const month = String(now.getMonth() + 1).padStart(2, '0')
-  return `${year}-${month}-01`
-}
 
 interface ReportFilters {
   from: string
