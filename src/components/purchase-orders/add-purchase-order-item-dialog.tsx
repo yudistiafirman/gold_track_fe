@@ -11,7 +11,9 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import { formatCurrency, formatThousands } from '@/lib/format'
+import { cn } from '@/lib/utils'
 import type { Product } from '@/types/product'
 
 export interface PurchaseOrderItemDraftInput {
@@ -26,10 +28,12 @@ interface AddPurchaseOrderItemDialogProps {
   onAdd: (item: PurchaseOrderItemDraftInput) => void
 }
 
+type PriceMode = 'unit' | 'gram'
+
 interface FormValues {
   product: Product | null
   quantity: string
-  purchasePrice: string
+  priceInput: string
 }
 
 interface FormErrors {
@@ -39,7 +43,7 @@ interface FormErrors {
 }
 
 function createInitialValues(): FormValues {
-  return { product: null, quantity: '', purchasePrice: '' }
+  return { product: null, quantity: '', priceInput: '' }
 }
 
 /**
@@ -54,13 +58,32 @@ export function AddPurchaseOrderItemDialog({
   onAdd,
 }: AddPurchaseOrderItemDialogProps) {
   const [values, setValues] = useState<FormValues>(createInitialValues)
+  const [priceMode, setPriceMode] = useState<PriceMode>('unit')
   const [errors, setErrors] = useState<FormErrors>({})
   const [pickProductOpen, setPickProductOpen] = useState(false)
 
   function handleClose() {
     setValues(createInitialValues())
+    setPriceMode('unit')
     setErrors({})
     onOpenChange(false)
+  }
+
+  function handlePriceModeChange(nextMode: PriceMode) {
+    setValues((prev) => {
+      const weight = prev.product?.weight_gram
+      if (nextMode === priceMode || !weight || !prev.priceInput) return prev
+      const currentValue = Number(prev.priceInput)
+      const converted = nextMode === 'gram' ? currentValue / weight : currentValue * weight
+      return { ...prev, priceInput: String(Math.round(converted)) }
+    })
+    setPriceMode(nextMode)
+  }
+
+  /** Resolves whatever the user typed (per-unit or per-gram) down to the flat per-unit price the PO API expects. */
+  function unitPriceFor(formValues: FormValues, mode: PriceMode): number {
+    const raw = Number(formValues.priceInput || 0)
+    return mode === 'gram' ? raw * (formValues.product?.weight_gram ?? 0) : raw
   }
 
   function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
@@ -74,9 +97,10 @@ export function AddPurchaseOrderItemDialog({
     } else if (!Number.isInteger(quantity) || quantity <= 0) {
       validationErrors.quantity = 'Quantity harus berupa bilangan bulat lebih dari 0'
     }
-    const purchasePrice = Number(values.purchasePrice)
-    if (!values.purchasePrice.trim()) {
-      validationErrors.purchase_price = 'Harga beli wajib diisi'
+    const purchasePrice = unitPriceFor(values, priceMode)
+    if (!values.priceInput.trim()) {
+      validationErrors.purchase_price =
+        priceMode === 'gram' ? 'Harga beli per gram wajib diisi' : 'Harga beli wajib diisi'
     } else if (Number.isNaN(purchasePrice) || purchasePrice <= 0) {
       validationErrors.purchase_price = 'Harga beli harus berupa angka lebih dari 0'
     }
@@ -86,14 +110,15 @@ export function AddPurchaseOrderItemDialog({
     onAdd({
       product: { id: values.product.id, name: values.product.name, sku: values.product.sku },
       quantity,
-      purchasePrice: values.purchasePrice,
+      purchasePrice: String(Math.round(purchasePrice)),
     })
 
     setValues(createInitialValues())
     setErrors({})
   }
 
-  const computedSubtotal = Number(values.quantity || 0) * Number(values.purchasePrice || 0)
+  const computedUnitPrice = unitPriceFor(values, priceMode)
+  const computedSubtotal = Number(values.quantity || 0) * computedUnitPrice
 
   return (
     <>
@@ -135,29 +160,52 @@ export function AddPurchaseOrderItemDialog({
               />
             </FormField>
 
-            <FormField
-              label="Harga Beli (per unit)"
-              htmlFor="po-item-price"
-              required
-              error={errors.purchase_price}
-              description={
-                values.quantity && values.purchasePrice
-                  ? `Subtotal ${formatCurrency(computedSubtotal)}`
-                  : undefined
-              }
-            >
+            <div className="flex flex-col gap-1.5">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="po-item-price" className="text-label text-gray-700">
+                  Harga Beli
+                  <span className="text-error"> *</span>
+                </Label>
+                <div className="flex items-center gap-0.5 rounded-md bg-muted p-0.5">
+                  {(['unit', 'gram'] as const).map((mode) => (
+                    <button
+                      key={mode}
+                      type="button"
+                      onClick={() => handlePriceModeChange(mode)}
+                      className={cn(
+                        'rounded-sm px-2 py-1 text-caption font-medium transition-colors',
+                        priceMode === mode
+                          ? 'bg-card text-gray-900 shadow-sm'
+                          : 'text-gray-500 hover:text-gray-700',
+                      )}
+                    >
+                      {mode === 'unit' ? 'Per Unit' : 'Per Gram'}
+                    </button>
+                  ))}
+                </div>
+              </div>
               <Input
                 id="po-item-price"
                 type="text"
                 inputMode="numeric"
                 placeholder="0"
-                value={formatThousands(values.purchasePrice)}
+                value={formatThousands(values.priceInput)}
                 onChange={(event) => {
                   const digits = event.target.value.replace(/\D/g, '')
-                  setValues((prev) => ({ ...prev, purchasePrice: digits }))
+                  setValues((prev) => ({ ...prev, priceInput: digits }))
                 }}
               />
-            </FormField>
+              {errors.purchase_price ? (
+                <p className="text-caption text-error">{errors.purchase_price}</p>
+              ) : priceMode === 'gram' && values.product && values.priceInput ? (
+                <p className="text-caption text-gray-500">
+                  Berat {values.product.weight_gram} gr · Harga/unit {formatCurrency(computedUnitPrice)}
+                  {values.quantity && ` · Subtotal ${formatCurrency(computedSubtotal)}`}
+                </p>
+              ) : priceMode === 'unit' && values.quantity && values.priceInput ? (
+                <p className="text-caption text-gray-500">Subtotal {formatCurrency(computedSubtotal)}</p>
+              ) : null}
+            </div>
 
             <DialogFooter>
               <Button type="button" variant="secondary" onClick={handleClose}>
