@@ -135,6 +135,12 @@ export function StockItemsTab({ productId }: StockItemsTabProps) {
         cell: (row) => formatDate(row.purchase_date),
       },
       {
+        id: 'production_year',
+        header: 'Tahun Produksi',
+        cell: (row) => row.production_year ?? '—',
+        className: 'text-table-num',
+      },
+      {
         id: 'actions',
         header: '',
         className: 'w-0',

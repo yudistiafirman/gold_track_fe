@@ -41,6 +41,7 @@ export interface PurchaseOrderDetail extends PurchaseOrder {
 export interface ReceivePurchaseOrderSerialInput {
   serial_number: string
   condition: StockCondition
+  production_year: number | null
 }
 
 export interface ReceivePurchaseOrderItemPayload {
@@ -57,6 +58,7 @@ export interface ReceivedUnit {
   barcode: string
   product_name: string
   serial_number: string
+  production_year: number | null
 }
 
 export interface ReceivePurchaseOrderResult extends PurchaseOrderDetail {

@@ -64,6 +64,7 @@ export function StockItemDetailDialog({ stockItemId, onClose }: StockItemDetailD
             />
             <DetailRow label="Harga Beli" value={formatCurrency(item.purchase_price)} />
             <DetailRow label="Tanggal Beli" value={formatDate(item.purchase_date)} />
+            <DetailRow label="Tahun Produksi" value={item.production_year ?? '—'} />
             <DetailRow label="Terjual" value={formatDate(item.sold_at)} />
             <DetailRow label="Catatan" value={item.notes ?? '—'} />
           </div>

@@ -11,6 +11,7 @@ export interface StockItem {
   condition: StockCondition
   purchase_price: number
   purchase_date: string
+  production_year: number | null
   status: StockStatus
   sold_at: string | null
   notes: string | null

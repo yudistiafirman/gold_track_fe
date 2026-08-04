@@ -37,6 +37,7 @@ interface BuybackCheckoutItemPayload {
   product_id: string
   serial_number: string
   condition: StockCondition
+  production_year: number | null
   price_total: number
 }
 
@@ -135,6 +136,7 @@ export function BuybackPage() {
         product_id: line.product.id,
         serial_number: line.serial_number,
         condition: line.condition,
+        production_year: line.production_year,
         price_total: lineTotal(line),
       })),
     })
@@ -175,6 +177,12 @@ export function BuybackPage() {
       id: 'condition',
       header: 'Kondisi',
       cell: (line) => <StatusBadge tone={STOCK_CONDITION_TONE[line.condition]} label={line.condition} />,
+    },
+    {
+      id: 'production_year',
+      header: 'Tahun Produksi',
+      cell: (line) => line.production_year ?? '—',
+      className: 'text-table-num',
     },
     {
       id: 'weight',

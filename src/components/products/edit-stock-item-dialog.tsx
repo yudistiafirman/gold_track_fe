@@ -24,6 +24,7 @@ import { api } from '@/lib/api/client'
 import { ApiError } from '@/lib/api/error'
 import type { StockCondition } from '@/lib/domain-status'
 import { formatThousands } from '@/lib/format'
+import { PRODUCTION_YEAR_MAX, PRODUCTION_YEAR_MIN } from '@/lib/production-year'
 import {
   type StockItemFormErrors,
   type StockItemFormValues,
@@ -37,6 +38,7 @@ interface UpdateStockItemPayload {
   condition: StockCondition
   purchase_price: number
   purchase_date: string | null
+  production_year: number | null
   notes: string | null
 }
 
@@ -66,6 +68,7 @@ export function EditStockItemDialog({ stockItemId, onClose }: EditStockItemDialo
         condition: item.condition,
         purchase_price: String(item.purchase_price),
         purchase_date: item.purchase_date?.slice(0, 10) ?? '',
+        production_year: item.production_year !== null ? String(item.production_year) : '',
         notes: item.notes ?? '',
       })
     }
@@ -113,6 +116,7 @@ export function EditStockItemDialog({ stockItemId, onClose }: EditStockItemDialo
       condition: values.condition as StockCondition,
       purchase_price: Number(values.purchase_price),
       purchase_date: values.purchase_date || null,
+      production_year: values.production_year.trim() ? Number(values.production_year) : null,
       notes: values.notes.trim() || null,
     })
   }
@@ -222,6 +226,28 @@ export function EditStockItemDialog({ stockItemId, onClose }: EditStockItemDialo
                 value={values.purchase_date}
                 onChange={(event) =>
                   setValues((prev) => (prev ? { ...prev, purchase_date: event.target.value } : prev))
+                }
+                disabled={fieldsDisabled}
+              />
+            </FormField>
+
+            <FormField
+              label="Tahun Produksi"
+              htmlFor="edit-stock-production-year"
+              description="Opsional"
+              error={errors.production_year}
+            >
+              <Input
+                id="edit-stock-production-year"
+                type="number"
+                min={PRODUCTION_YEAR_MIN}
+                max={PRODUCTION_YEAR_MAX}
+                placeholder="Opsional"
+                value={values.production_year}
+                onChange={(event) =>
+                  setValues((prev) =>
+                    prev ? { ...prev, production_year: event.target.value } : prev,
+                  )
                 }
                 disabled={fieldsDisabled}
               />

@@ -1,10 +1,12 @@
 import type { StockCondition } from '@/lib/domain-status'
+import { validateProductionYear } from '@/lib/production-year'
 
 export interface StockItemFormValues {
   serial_number: string
   condition: StockCondition | ''
   purchase_price: string
   purchase_date: string
+  production_year: string
   notes: string
 }
 
@@ -12,6 +14,7 @@ export interface StockItemFormErrors {
   serial_number?: string
   condition?: string
   purchase_price?: string
+  production_year?: string
 }
 
 export function validateStockItemForm(values: StockItemFormValues): StockItemFormErrors {
@@ -26,6 +29,9 @@ export function validateStockItemForm(values: StockItemFormValues): StockItemFor
   } else if (Number.isNaN(price) || price <= 0) {
     errors.purchase_price = 'Harga beli harus berupa angka lebih dari 0'
   }
+
+  const productionYearError = validateProductionYear(values.production_year)
+  if (productionYearError) errors.production_year = productionYearError
 
   return errors
 }

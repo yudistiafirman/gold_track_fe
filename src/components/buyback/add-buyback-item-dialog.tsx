@@ -20,6 +20,7 @@ import {
 } from '@/components/ui/select'
 import type { StockCondition } from '@/lib/domain-status'
 import { formatCurrency, formatThousands } from '@/lib/format'
+import { PRODUCTION_YEAR_MAX, PRODUCTION_YEAR_MIN, validateProductionYear } from '@/lib/production-year'
 import { useBuybackCartStore } from '@/store/buyback-cart-store'
 import type { Product } from '@/types/product'
 
@@ -32,6 +33,7 @@ interface FormValues {
   product: Product | null
   serialNumber: string
   condition: StockCondition | ''
+  productionYear: string
   pricePerGram: string
 }
 
@@ -39,11 +41,12 @@ interface FormErrors {
   product?: string
   serial_number?: string
   condition?: string
+  production_year?: string
   price_per_gram?: string
 }
 
 function createInitialValues(): FormValues {
-  return { product: null, serialNumber: '', condition: '', pricePerGram: '' }
+  return { product: null, serialNumber: '', condition: '', productionYear: '', pricePerGram: '' }
 }
 
 /**
@@ -77,6 +80,8 @@ export function AddBuybackItemDialog({ open, onOpenChange }: AddBuybackItemDialo
     } else if (Number.isNaN(pricePerGram) || pricePerGram <= 0) {
       validationErrors.price_per_gram = 'Harga beli per gram harus berupa angka lebih dari 0'
     }
+    const productionYearError = validateProductionYear(values.productionYear)
+    if (productionYearError) validationErrors.production_year = productionYearError
     setErrors(validationErrors)
     if (Object.keys(validationErrors).length > 0 || !values.product || !values.condition) return
 
@@ -89,6 +94,7 @@ export function AddBuybackItemDialog({ open, onOpenChange }: AddBuybackItemDialo
       },
       serial_number: values.serialNumber.trim(),
       condition: values.condition,
+      production_year: values.productionYear.trim() ? Number(values.productionYear) : null,
       pricePerGram: values.pricePerGram,
     })
 
@@ -167,6 +173,25 @@ export function AddBuybackItemDialog({ open, onOpenChange }: AddBuybackItemDialo
                   <SelectItem value="BAD">Bad</SelectItem>
                 </SelectContent>
               </Select>
+            </FormField>
+
+            <FormField
+              label="Tahun Produksi"
+              htmlFor="buyback-item-production-year"
+              description="Opsional"
+              error={errors.production_year}
+            >
+              <Input
+                id="buyback-item-production-year"
+                type="number"
+                min={PRODUCTION_YEAR_MIN}
+                max={PRODUCTION_YEAR_MAX}
+                placeholder="Opsional"
+                value={values.productionYear}
+                onChange={(event) =>
+                  setValues((prev) => ({ ...prev, productionYear: event.target.value }))
+                }
+              />
             </FormField>
 
             <FormField

@@ -19,6 +19,7 @@ import {
 import { api } from '@/lib/api/client'
 import { ApiError } from '@/lib/api/error'
 import type { StockCondition } from '@/lib/domain-status'
+import { PRODUCTION_YEAR_MAX, PRODUCTION_YEAR_MIN, validateProductionYear } from '@/lib/production-year'
 import { showSuccessToast } from '@/lib/toast'
 import { NotFoundPage } from '@/pages/not-found-page'
 import type {
@@ -30,6 +31,7 @@ import type {
 interface SerialSlot {
   serialNumber: string
   condition: StockCondition | ''
+  productionYear: string
 }
 
 interface ItemReceiveState {
@@ -63,7 +65,11 @@ export function ReceivePurchaseOrderPage() {
       const next: Record<string, ItemReceiveState> = {}
       for (const item of po.items) {
         next[item.product.id] = {
-          slots: Array.from({ length: item.quantity }, () => ({ serialNumber: '', condition: '' })),
+          slots: Array.from({ length: item.quantity }, () => ({
+            serialNumber: '',
+            condition: '',
+            productionYear: '',
+          })),
         }
       }
       return next
@@ -137,12 +143,28 @@ export function ReceivePurchaseOrderPage() {
     }))
   }
 
+  function setSlotProductionYear(productId: string, index: number, productionYear: string) {
+    setItemState((prev) => ({
+      ...prev,
+      [productId]: {
+        slots: prev[productId].slots.map((slot, i) =>
+          i === index ? { ...slot, productionYear } : slot,
+        ),
+      },
+    }))
+  }
+
   const poItems = po.items
 
   const isReady = poItems.every((item) => {
     const state = itemState[item.product.id]
     if (!state || state.slots.length !== item.quantity) return false
-    return state.slots.every((slot) => slot.serialNumber.trim() !== '' && slot.condition !== '')
+    return state.slots.every(
+      (slot) =>
+        slot.serialNumber.trim() !== '' &&
+        slot.condition !== '' &&
+        !validateProductionYear(slot.productionYear),
+    )
   })
 
   function handleSubmit() {
@@ -154,6 +176,7 @@ export function ReceivePurchaseOrderPage() {
         serials: itemState[item.product.id].slots.map((slot) => ({
           serial_number: slot.serialNumber.trim(),
           condition: slot.condition as StockCondition,
+          production_year: slot.productionYear.trim() ? Number(slot.productionYear) : null,
         })),
       })),
     })
@@ -191,6 +214,9 @@ export function ReceivePurchaseOrderPage() {
                     Serial Number
                   </th>
                   <th className="px-4 py-3 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                    Tahun Produksi
+                  </th>
+                  <th className="px-4 py-3 text-xs font-medium uppercase tracking-wide text-muted-foreground">
                     Barcode
                   </th>
                   <th className="w-0 px-4 py-3" />
@@ -201,6 +227,9 @@ export function ReceivePurchaseOrderPage() {
                   <tr key={unit.stock_item_id} className="border-t border-border">
                     <td className="px-4 py-3 text-gray-900">{unit.product_name}</td>
                     <td className="px-4 py-3 text-gray-900">{unit.serial_number}</td>
+                    <td className="px-4 py-3 tabular-nums text-gray-900">
+                      {unit.production_year ?? '—'}
+                    </td>
                     <td className="px-4 py-3 tabular-nums text-gray-900">{unit.barcode}</td>
                     <td className="px-4 py-3">
                       <Button
@@ -282,34 +311,54 @@ export function ReceivePurchaseOrderPage() {
               </div>
 
               <div className="flex flex-col gap-2">
-                {state?.slots.map((slot, index) => (
-                  <div key={index} className="flex items-center gap-2">
-                    <Input
-                      value={slot.serialNumber}
-                      onChange={(event) =>
-                        setSerialNumber(item.product.id, index, event.target.value)
-                      }
-                      placeholder={`Serial #${index + 1}`}
-                      disabled={receiveMutation.isPending}
-                      className="flex-1"
-                    />
-                    <Select
-                      value={slot.condition}
-                      onValueChange={(value) =>
-                        setSlotCondition(item.product.id, index, value as StockCondition)
-                      }
-                      disabled={receiveMutation.isPending}
-                    >
-                      <SelectTrigger className="w-32">
-                        <SelectValue placeholder="Kondisi" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="GOOD">Good</SelectItem>
-                        <SelectItem value="BAD">Bad</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                ))}
+                {state?.slots.map((slot, index) => {
+                  const productionYearError = validateProductionYear(slot.productionYear)
+                  return (
+                    <div key={index} className="flex flex-col gap-1">
+                      <div className="flex items-center gap-2">
+                        <Input
+                          value={slot.serialNumber}
+                          onChange={(event) =>
+                            setSerialNumber(item.product.id, index, event.target.value)
+                          }
+                          placeholder={`Serial #${index + 1}`}
+                          disabled={receiveMutation.isPending}
+                          className="flex-1"
+                        />
+                        <Select
+                          value={slot.condition}
+                          onValueChange={(value) =>
+                            setSlotCondition(item.product.id, index, value as StockCondition)
+                          }
+                          disabled={receiveMutation.isPending}
+                        >
+                          <SelectTrigger className="w-32">
+                            <SelectValue placeholder="Kondisi" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="GOOD">Good</SelectItem>
+                            <SelectItem value="BAD">Bad</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <Input
+                          type="number"
+                          min={PRODUCTION_YEAR_MIN}
+                          max={PRODUCTION_YEAR_MAX}
+                          placeholder="Tahun produksi (opsional)"
+                          value={slot.productionYear}
+                          onChange={(event) =>
+                            setSlotProductionYear(item.product.id, index, event.target.value)
+                          }
+                          disabled={receiveMutation.isPending}
+                          className="w-44"
+                        />
+                      </div>
+                      {productionYearError && (
+                        <p className="text-caption text-error">{productionYearError}</p>
+                      )}
+                    </div>
+                  )
+                })}
               </div>
             </div>
           )

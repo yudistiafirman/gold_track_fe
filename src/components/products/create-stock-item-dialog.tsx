@@ -26,6 +26,7 @@ import { api } from '@/lib/api/client'
 import { ApiError } from '@/lib/api/error'
 import type { StockCondition } from '@/lib/domain-status'
 import { formatThousands, todayDateInputValue } from '@/lib/format'
+import { PRODUCTION_YEAR_MAX, PRODUCTION_YEAR_MIN } from '@/lib/production-year'
 import {
   type StockItemFormValues,
   validateStockItemForm,
@@ -37,6 +38,7 @@ interface CreateStockItemPayload {
   condition: StockCondition
   purchase_price: number
   purchase_date: string | null
+  production_year: number | null
   notes: string | null
 }
 
@@ -46,6 +48,7 @@ function createInitialValues(): StockItemFormValues {
     condition: '',
     purchase_price: '',
     purchase_date: todayDateInputValue(),
+    production_year: '',
     notes: '',
   }
 }
@@ -115,6 +118,7 @@ export function CreateStockItemDialog({
       condition: values.condition as StockCondition,
       purchase_price: Number(values.purchase_price),
       purchase_date: values.purchase_date || null,
+      production_year: values.production_year.trim() ? Number(values.production_year) : null,
       notes: values.notes.trim() || null,
     })
   }
@@ -243,6 +247,26 @@ export function CreateStockItemDialog({
                   value={values.purchase_date}
                   onChange={(event) =>
                     setValues((prev) => ({ ...prev, purchase_date: event.target.value }))
+                  }
+                  disabled={createMutation.isPending}
+                />
+              </FormField>
+
+              <FormField
+                label="Tahun Produksi"
+                htmlFor="stock-production-year"
+                description="Opsional"
+                error={errors.production_year}
+              >
+                <Input
+                  id="stock-production-year"
+                  type="number"
+                  min={PRODUCTION_YEAR_MIN}
+                  max={PRODUCTION_YEAR_MAX}
+                  placeholder="Opsional"
+                  value={values.production_year}
+                  onChange={(event) =>
+                    setValues((prev) => ({ ...prev, production_year: event.target.value }))
                   }
                   disabled={createMutation.isPending}
                 />

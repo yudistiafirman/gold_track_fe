@@ -117,15 +117,18 @@ export function EditUserDialog({ userId, onClose }: EditUserDialogProps) {
     })
   }
 
-  // FE-1401 AC4: email conflict (409) shows inline on the Email field, not a
-  // generic banner/toast.
-  const emailError =
-    errors.email ??
-    (updateMutation.isError
-      ? updateMutation.error instanceof ApiError
-        ? updateMutation.error.message
-        : 'Terjadi kesalahan, silakan coba lagi.'
-      : undefined)
+  // FE-1401 AC4: email conflict (409) shows inline on the Email field rather
+  // than a generic banner/toast. Password policy errors (400) are also
+  // field-level, so route by message content — see the matching comment in
+  // CreateUserDialog for why.
+  const submitErrorMessage = updateMutation.isError
+    ? updateMutation.error instanceof ApiError
+      ? updateMutation.error.message
+      : 'Terjadi kesalahan, silakan coba lagi.'
+    : undefined
+  const isPasswordSubmitError = submitErrorMessage?.toLowerCase().includes('password') ?? false
+  const emailError = errors.email ?? (isPasswordSubmitError ? undefined : submitErrorMessage)
+  const passwordError = errors.password ?? (isPasswordSubmitError ? submitErrorMessage : undefined)
 
   const isPrefilling = userQuery.isPending || values === null
 
@@ -169,8 +172,8 @@ export function EditUserDialog({ userId, onClose }: EditUserDialogProps) {
             <FormField
               label="Password Baru"
               htmlFor="edit-user-password"
-              error={errors.password}
-              description="Kosongkan untuk mempertahankan password lama"
+              error={passwordError}
+              description="Kosongkan untuk mempertahankan password lama. Jika diisi: minimal 8 karakter, kombinasi huruf besar, huruf kecil, angka, dan simbol."
             >
               <Input
                 id="edit-user-password"

@@ -78,10 +78,18 @@ export function CreateUserDialog({ open, onOpenChange }: CreateUserDialogProps) 
     })
   }
 
-  // FE-1401 AC4: email conflict (409) shows inline on the Email field, not a
-  // generic banner/toast — email is the only unique/conflicting field this
-  // endpoint has, so any submit error is routed there.
-  const emailError = errors.email ?? (createMutation.isError ? emailErrorMessage(createMutation.error) : undefined)
+  // FE-1401 AC4: email conflict (409) shows inline on the Email field rather
+  // than a generic banner/toast. Password policy errors (400) are also
+  // field-level, so route by message content — ApiError only carries a
+  // single code+message, no structured per-field detail, and "password" only
+  // ever appears in the BE's password-rule messages, never the email-conflict
+  // one.
+  const submitErrorMessage = createMutation.isError
+    ? emailErrorMessage(createMutation.error)
+    : undefined
+  const isPasswordSubmitError = submitErrorMessage?.toLowerCase().includes('password') ?? false
+  const emailError = errors.email ?? (isPasswordSubmitError ? undefined : submitErrorMessage)
+  const passwordError = errors.password ?? (isPasswordSubmitError ? submitErrorMessage : undefined)
 
   return (
     <Dialog open={open} onOpenChange={(next) => (next ? onOpenChange(next) : handleClose())}>
@@ -111,7 +119,13 @@ export function CreateUserDialog({ open, onOpenChange }: CreateUserDialogProps) 
             />
           </FormField>
 
-          <FormField label="Password" htmlFor="user-password" required error={errors.password}>
+          <FormField
+            label="Password"
+            htmlFor="user-password"
+            required
+            error={passwordError}
+            description="Minimal 8 karakter, kombinasi huruf besar, huruf kecil, angka, dan simbol"
+          >
             <Input
               id="user-password"
               type="password"

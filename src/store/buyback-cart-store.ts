@@ -20,6 +20,7 @@ export interface BuybackItemLine {
   product: BuybackProductRef
   serial_number: string
   condition: StockCondition
+  production_year: number | null
   /** Raw digits — price per gram, matching the Sell page's calculation (price/gram × weight_gram = subtotal). */
   pricePerGram: string
 }
