@@ -4,7 +4,6 @@ import {
   BarChart3,
   Eye,
   EyeOff,
-  Gem,
   HelpCircle,
   Loader2,
   Lock,
@@ -101,20 +100,20 @@ export function LoginPage() {
         />
 
         <div className="relative z-10 flex animate-in fade-in slide-in-from-top-2 items-center gap-3 duration-700">
-          <div className="flex size-11 items-center justify-center rounded-xl border border-white/20 bg-white/10 shadow-lg backdrop-blur-sm">
-            <Gem className="size-5" />
+          <div className="flex size-11 items-center justify-center overflow-hidden rounded-xl shadow-lg">
+            <img src="/gold-bars.png" alt="" className="size-full scale-125 object-cover" />
           </div>
-          <span className="text-h3 font-semibold tracking-tight text-white">GoldTrack</span>
+          <span className="text-h3 font-semibold tracking-tight text-white">LAGILAGI.EMAS</span>
         </div>
 
         <div className="relative z-10 max-w-md animate-in fade-in slide-in-from-bottom-4 duration-700">
           <span className="mb-4 inline-flex items-center rounded-full border border-white/20 bg-white/10 px-3 py-1 text-caption text-white/80 backdrop-blur-sm">
-            Sistem Manajemen Toko Emas
+            Portal Internal LAGILAGI.EMAS
           </span>
-          <h1 className="text-h1 mb-3 text-white">Kelola toko emas Anda dengan percaya diri</h1>
+          <h1 className="text-h1 mb-3 text-white">Kelola operasional LAGILAGI.EMAS dengan percaya diri</h1>
           <p className="text-body text-white/70">
-            Satu platform untuk transaksi jual-beli, stok, purchase order, dan laporan — semuanya
-            rapi dan real-time.
+            Platform internal untuk transaksi jual-beli, stok, purchase order, dan laporan —
+            semuanya rapi dan real-time.
           </p>
 
           <ul className="mt-8 flex flex-col gap-4">
@@ -133,7 +132,7 @@ export function LoginPage() {
         </div>
 
         <div className="relative z-10 flex items-center justify-between border-t border-white/10 pt-6 text-caption text-white/40">
-          <span>© {new Date().getFullYear()} GoldTrack</span>
+          <span>© {new Date().getFullYear()} LAGILAGI.EMAS</span>
           <span>v1.0</span>
         </div>
       </div>
@@ -141,10 +140,10 @@ export function LoginPage() {
       <div className="flex flex-1 items-center justify-center p-6 md:p-12">
         <div className="w-full max-w-[400px]">
           <div className="mb-8 flex items-center justify-center gap-2.5 md:hidden">
-            <div className="flex size-9 items-center justify-center rounded-lg bg-green-500 text-white shadow-card">
-              <Gem className="size-4" />
+            <div className="flex size-9 items-center justify-center overflow-hidden rounded-lg shadow-card">
+              <img src="/gold-bars.png" alt="" className="size-full scale-125 object-cover" />
             </div>
-            <span className="text-h3 font-semibold text-gray-900">GoldTrack</span>
+            <span className="text-h3 font-semibold text-gray-900">lagilagi.emas</span>
           </div>
 
           <div className="animate-in fade-in slide-in-from-bottom-2 rounded-2xl border border-border bg-card p-8 shadow-modal duration-500">

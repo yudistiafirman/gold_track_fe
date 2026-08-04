@@ -1,4 +1,4 @@
-import { ChevronRight, Gem } from 'lucide-react'
+import { ChevronRight } from 'lucide-react'
 import { Link, useLocation } from 'react-router-dom'
 import {
   type NavGroup,
@@ -98,11 +98,11 @@ export function AppSidebar() {
     <Sidebar collapsible="icon">
       <SidebarHeader className="border-b border-sidebar-border">
         <div className="flex items-center gap-2.5 px-2 py-2 group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:justify-center">
-          <div className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground shadow-sm">
-            <Gem className="size-3.5" />
+          <div className="flex size-7 shrink-0 items-center justify-center overflow-hidden rounded-lg shadow-sm">
+            <img src="/gold-bars.png" alt="" className="size-full scale-125 object-cover" />
           </div>
           <span className="text-label font-semibold text-sidebar-foreground group-data-[collapsible=icon]:hidden">
-            GoldTrack
+            LAGILAGI.EMAS
           </span>
         </div>
       </SidebarHeader>
