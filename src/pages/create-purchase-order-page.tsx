@@ -1,7 +1,7 @@
 import { useMutation } from '@tanstack/react-query'
-import { ClipboardList, Loader2, Plus, StickyNote, Truck, X } from 'lucide-react'
+import { ArrowLeft, ClipboardList, Loader2, Plus, StickyNote, Truck, X } from 'lucide-react'
 import { useMemo, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import {
   AddPurchaseOrderItemDialog,
   type PurchaseOrderItemDraftInput,
@@ -138,7 +138,13 @@ export function CreatePurchaseOrderPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <div>
+      <div className="flex flex-col gap-1">
+        <Button asChild variant="ghost" size="sm" className="-ml-2 w-fit">
+          <Link to="/purchase-orders">
+            <ArrowLeft />
+            Kembali
+          </Link>
+        </Button>
         <h1 className="text-h1 text-gray-900">Buat Purchase Order</h1>
         <p className="text-caption text-gray-500">Susun pesanan pembelian barang ke supplier.</p>
       </div>

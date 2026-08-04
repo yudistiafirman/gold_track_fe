@@ -10,6 +10,15 @@ function escapeHtml(value: string): string {
     .replace(/'/g, '&#39;')
 }
 
+// Target module (single bar) width for reliable scanning on a 203dpi thermal
+// printer with a basic handheld scanner — below ~0.25mm bars start dropping
+// out; 0.33mm gives real margin. Width is capped at BARCODE_MAX_WIDTH_MM so
+// it never overflows the 50mm label (44mm printable area + slack), only
+// shrinking below the safe module width for barcode values long enough to
+// not fit otherwise.
+const BARCODE_MODULE_MM = 0.33
+const BARCODE_MAX_WIDTH_MM = 46
+
 export function renderBarcodeSvg(value: string): string {
   const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
   JsBarcode(svg, value, {
@@ -17,10 +26,31 @@ export function renderBarcodeSvg(value: string): string {
     displayValue: false,
     margin: 0,
     height: 30,
+    width: 1,
   })
+
+  // jsbarcode's SVG renderer sets width/height as e.g. "266px" (string, unit
+  // suffix included) — Number() on that is NaN, so this must use parseFloat.
+  const naturalWidth = parseFloat(svg.getAttribute('width') ?? '') || 1
+  const naturalHeight = parseFloat(svg.getAttribute('height') ?? '') || 1
+  const widthMm = Math.min(BARCODE_MAX_WIDTH_MM, naturalWidth * BARCODE_MODULE_MM)
+  const heightMm = naturalHeight * (widthMm / naturalWidth)
+
+  svg.setAttribute('viewBox', `0 0 ${naturalWidth} ${naturalHeight}`)
+  svg.setAttribute('width', `${widthMm}mm`)
+  svg.setAttribute('height', `${heightMm}mm`)
+
   return new XMLSerializer().serializeToString(svg)
 }
 
+/**
+ * TEMPORARY scan-readability test: encodes serial_number (short) instead of
+ * the real backend barcode (long, doesn't fit 46mm at a safe module width).
+ * Do NOT use these labels for real Sell/Buyback/Opname scans — the lookup
+ * endpoints match against the `barcode` field, not serial_number, so a
+ * label printed this way will fail to resolve. Revert to label.barcode once
+ * the backend barcode format is shortened.
+ */
 function renderLabelHtml(label: StockItemLabel): string {
   const barcodeSvg = renderBarcodeSvg(label.barcode)
   return `<div class="label">
@@ -64,7 +94,6 @@ function buildLabelDocument(labelsHtml: string[]): string {
         overflow: hidden;
         text-overflow: ellipsis;
       }
-      svg { width: 44mm; height: auto; }
       .barcode-value {
         width: 100%;
         font-size: 6.5pt;

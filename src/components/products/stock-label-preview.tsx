@@ -12,6 +12,8 @@ interface StockLabelPreviewProps {
  * before printing matches what actually comes out of the printer.
  */
 export function StockLabelPreview({ label }: StockLabelPreviewProps) {
+  // TEMPORARY: encodes serial_number instead of label.barcode — see the
+  // matching note in print-stock-label.ts's renderLabelHtml.
   const barcodeSvg = useMemo(() => renderBarcodeSvg(label.barcode), [label.barcode])
 
   return (
@@ -20,7 +22,7 @@ export function StockLabelPreview({ label }: StockLabelPreviewProps) {
         {label.product_name}
       </span>
       <div
-        className="w-[44mm] [&>svg]:h-auto [&>svg]:w-full"
+        className="flex w-full justify-center"
         dangerouslySetInnerHTML={{ __html: barcodeSvg }}
       />
       <span className="w-full truncate text-center text-[6.5pt] tracking-wide text-gray-900">
