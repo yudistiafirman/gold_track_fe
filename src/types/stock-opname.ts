@@ -35,8 +35,9 @@ export interface StockOpnameItem {
   scanned_at?: string | null
 }
 
+/** items is absent while the session is IN_PROGRESS — only populated once the session is COMPLETED. */
 export interface StockOpnameDetail extends StockOpname {
-  items: StockOpnameItem[]
+  items?: StockOpnameItem[]
 }
 
 /** A single scan's result — FE-1102's response is one item, not the whole session. MISSING can't occur from a live scan (it's only known once the session is completed and unscanned units are diffed). */

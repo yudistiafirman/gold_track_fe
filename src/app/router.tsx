@@ -31,6 +31,7 @@ import { ScanOpnamePage } from '@/pages/scan-opname-page'
 import { SellPage } from '@/pages/sell-page'
 import { SettingsPage } from '@/pages/settings-page'
 import { StartOpnamePage } from '@/pages/start-opname-page'
+import { StockOpnamesPage } from '@/pages/stock-opnames-page'
 import { StockReportPage } from '@/pages/stock-report-page'
 import { SupplierDetailPage } from '@/pages/supplier-detail-page'
 import { SuppliersPage } from '@/pages/suppliers-page'
@@ -86,7 +87,8 @@ export const router = createBrowserRouter([
                     path: 'purchase-orders/:id/receive',
                     element: <ReceivePurchaseOrderPage />,
                   },
-                  { path: 'stock-opnames', element: <StartOpnamePage /> },
+                  { path: 'stock-opnames', element: <StockOpnamesPage /> },
+                  { path: 'stock-opnames/new', element: <StartOpnamePage /> },
                   { path: 'stock-opnames/:id/scan', element: <ScanOpnamePage /> },
                   { path: 'stock-opnames/:id', element: <OpnameResultPage /> },
                   {

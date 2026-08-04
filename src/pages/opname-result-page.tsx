@@ -45,7 +45,10 @@ export function OpnameResultPage() {
   const opname = opnameQuery.data
 
   const filteredItems = useMemo(() => {
-    if (!opname) return []
+    // items is absent while the session is still IN_PROGRESS (only
+    // finalized on complete) — the branch below never renders the table for
+    // that status, but this memo still runs on every render regardless.
+    if (!opname || !opname.items) return []
     const lowerSearch = search.trim().toLowerCase()
     return opname.items.filter((item) => {
       if (resultFilter !== 'ALL' && item.result !== resultFilter) return false
