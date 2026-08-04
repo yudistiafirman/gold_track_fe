@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { ArrowLeft, Loader2, Printer } from 'lucide-react'
+import { ArrowLeft, CheckCircle2, Loader2, Package, Printer } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
@@ -109,7 +109,7 @@ export function ReceivePurchaseOrderPage() {
   // page is hidden/status has since changed.
   if (po.status !== 'BELUM_DITERIMA' && !result) {
     return (
-      <div className="flex flex-col items-center gap-4 rounded-lg border border-border bg-card p-8 text-center shadow-card">
+      <div className="flex flex-col items-center gap-4 rounded-xl border border-border bg-card p-8 text-center shadow-card">
         <p className="text-body text-gray-700">
           PO {po.po_code} berstatus <strong>{po.status}</strong> dan tidak bisa diterima ulang.
         </p>
@@ -195,15 +195,20 @@ export function ReceivePurchaseOrderPage() {
       <div className="flex flex-col gap-6">
         <h1 className="text-h1 text-gray-900">Terima Barang PO</h1>
 
-        <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 rounded-lg border border-border bg-card p-8 shadow-card">
-          <div>
-            <h2 className="text-h2 text-gray-900">PO Diterima</h2>
-            <p className="text-body text-gray-500">
-              {result.po_code} · {result.received_units.length} unit baru ditambahkan ke stok.
-            </p>
+        <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 rounded-xl border border-border bg-card p-8 shadow-modal">
+          <div className="flex items-center gap-4">
+            <div className="flex size-12 shrink-0 items-center justify-center rounded-full bg-green-100">
+              <CheckCircle2 className="size-6 text-green-700" />
+            </div>
+            <div>
+              <h2 className="text-h2 text-gray-900">PO Diterima</h2>
+              <p className="text-body text-gray-500">
+                {result.po_code} · {result.received_units.length} unit baru ditambahkan ke stok.
+              </p>
+            </div>
           </div>
 
-          <div className="overflow-hidden rounded-lg border border-border">
+          <div className="overflow-hidden rounded-xl border border-border">
             <table className="w-full text-left text-sm">
               <thead className="bg-muted">
                 <tr>
@@ -224,7 +229,10 @@ export function ReceivePurchaseOrderPage() {
               </thead>
               <tbody>
                 {result.received_units.map((unit) => (
-                  <tr key={unit.stock_item_id} className="border-t border-border">
+                  <tr
+                    key={unit.stock_item_id}
+                    className="border-t border-border transition-colors hover:bg-gray-50"
+                  >
                     <td className="px-4 py-3 text-gray-900">{unit.product_name}</td>
                     <td className="px-4 py-3 text-gray-900">{unit.serial_number}</td>
                     <td className="px-4 py-3 tabular-nums text-gray-900">
@@ -301,13 +309,24 @@ export function ReceivePurchaseOrderPage() {
           return (
             <div
               key={item.product.id}
-              className="flex flex-col gap-4 rounded-lg border border-border bg-card p-6 shadow-card"
+              className="flex flex-col gap-4 rounded-xl border border-border bg-card p-6 shadow-card"
             >
-              <div>
-                <h2 className="text-h3 text-gray-900">{item.product.name}</h2>
-                <p className="text-caption text-gray-500">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2.5">
+                  <div className="flex size-7 items-center justify-center rounded-lg bg-gray-100">
+                    <Package className="size-4 text-gray-600" />
+                  </div>
+                  <h2 className="text-h3 text-gray-900">{item.product.name}</h2>
+                </div>
+                <span
+                  className={
+                    filledCount === item.quantity
+                      ? 'rounded-full bg-green-100 px-2.5 py-0.5 text-caption font-medium text-green-700'
+                      : 'rounded-full bg-gray-100 px-2.5 py-0.5 text-caption font-medium text-gray-600'
+                  }
+                >
                   {filledCount}/{item.quantity} unit terisi
-                </p>
+                </span>
               </div>
 
               <div className="flex flex-col gap-2">
@@ -375,7 +394,12 @@ export function ReceivePurchaseOrderPage() {
       )}
 
       <div className="flex justify-end">
-        <Button size="lg" onClick={handleSubmit} disabled={!isReady || receiveMutation.isPending}>
+        <Button
+          size="lg"
+          onClick={handleSubmit}
+          disabled={!isReady || receiveMutation.isPending}
+          className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700"
+        >
           {receiveMutation.isPending && <Loader2 className="animate-spin" />}
           {receiveMutation.isPending ? 'Menyimpan...' : 'Terima Barang'}
         </Button>

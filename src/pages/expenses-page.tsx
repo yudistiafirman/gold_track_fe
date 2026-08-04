@@ -106,13 +106,6 @@ export function ExpensesPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex justify-end">
-        <Button onClick={() => setCreateOpen(true)}>
-          <Plus />
-          Tambah Pengeluaran
-        </Button>
-      </div>
-
       <DataTable
         columns={columns}
         data={expensesQuery.data?.items ?? []}
@@ -164,6 +157,10 @@ export function ExpensesPage() {
                 ))}
               </SelectContent>
             </Select>
+            <Button onClick={() => setCreateOpen(true)} className="ml-auto">
+              <Plus />
+              Tambah Pengeluaran
+            </Button>
           </div>
         }
       />

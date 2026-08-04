@@ -92,9 +92,12 @@ export function StockOpnamesPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-h1 text-gray-900">Stock Opname</h1>
-        <Button asChild>
+      <div className="flex items-center justify-between gap-3">
+        <div>
+          <h1 className="text-h1 text-gray-900">Stock Opname</h1>
+          <p className="text-caption text-gray-500">Riwayat sesi hitung stok fisik toko.</p>
+        </div>
+        <Button asChild className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700">
           <Link to="/stock-opnames/new">
             <Play />
             Mulai Opname Baru

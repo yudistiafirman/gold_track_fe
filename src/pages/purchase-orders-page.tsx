@@ -94,14 +94,9 @@ export function PurchaseOrdersPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex items-center justify-between">
+      <div>
         <h1 className="text-h1 text-gray-900">Purchase Order</h1>
-        <Button asChild>
-          <Link to="/purchase-orders/new">
-            <Plus />
-            Buat PO
-          </Link>
-        </Button>
+        <p className="text-caption text-gray-500">Kelola pesanan pembelian ke supplier.</p>
       </div>
       <DataTable
         columns={columns}
@@ -113,24 +108,32 @@ export function PurchaseOrdersPage() {
         emptyTitle={emptyTitle}
         emptyDescription={emptyDescription}
         filters={
-          <Select
-            value={status}
-            onValueChange={(value) => {
-              setStatus(value as PurchaseOrderStatus | 'ALL')
-              setPage(1)
-            }}
-          >
-            <SelectTrigger className="w-48">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {STATUS_OPTIONS.map((option) => (
-                <SelectItem key={option.value} value={option.value}>
-                  {option.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <>
+            <Select
+              value={status}
+              onValueChange={(value) => {
+                setStatus(value as PurchaseOrderStatus | 'ALL')
+                setPage(1)
+              }}
+            >
+              <SelectTrigger className="w-48">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {STATUS_OPTIONS.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Button asChild className="ml-auto">
+              <Link to="/purchase-orders/new">
+                <Plus />
+                Buat PO
+              </Link>
+            </Button>
+          </>
         }
       />
     </div>

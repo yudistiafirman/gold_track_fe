@@ -123,14 +123,6 @@ export function ProductsPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      {canCreate && (
-        <div className="flex justify-end">
-          <Button onClick={() => setCreateOpen(true)}>
-            <Plus />
-            Tambah Produk
-          </Button>
-        </div>
-      )}
       <DataTable
         columns={columns}
         data={productsQuery.data?.items ?? []}
@@ -144,6 +136,14 @@ export function ProductsPage() {
           setPage(1)
         }}
         searchPlaceholder="Cari nama produk..."
+        filters={
+          canCreate && (
+            <Button onClick={() => setCreateOpen(true)} className="ml-auto">
+              <Plus />
+              Tambah Produk
+            </Button>
+          )
+        }
         emptyTitle={emptyTitle}
         emptyDescription={emptyDescription}
       />

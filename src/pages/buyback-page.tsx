@@ -1,5 +1,5 @@
 import { useMutation } from '@tanstack/react-query'
-import { Loader2, Plus, Printer, Receipt, X } from 'lucide-react'
+import { CheckCircle2, Gem, Loader2, Plus, Printer, Receipt, StickyNote, Users, Wallet, X } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { AddBuybackItemDialog } from '@/components/buyback/add-buyback-item-dialog'
@@ -231,15 +231,20 @@ export function BuybackPage() {
       <div className="flex flex-col gap-6">
         <h1 className="text-h1 text-gray-900">Buyback</h1>
 
-        <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 rounded-lg border border-border bg-card p-8 shadow-card">
-          <div>
-            <h2 className="text-h2 text-gray-900">Transaksi Berhasil</h2>
-            <p className="text-body text-gray-500">
-              {result.transaction_code} · {resultRows.length} unit baru ditambahkan ke stok.
-            </p>
+        <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 rounded-xl border border-border bg-card p-8 shadow-modal">
+          <div className="flex items-center gap-4">
+            <div className="flex size-12 shrink-0 items-center justify-center rounded-full bg-green-100">
+              <CheckCircle2 className="size-6 text-green-700" />
+            </div>
+            <div>
+              <h2 className="text-h2 text-gray-900">Transaksi Berhasil</h2>
+              <p className="text-body text-gray-500">
+                {result.transaction_code} · {resultRows.length} unit baru ditambahkan ke stok.
+              </p>
+            </div>
           </div>
 
-          <div className="overflow-hidden rounded-lg border border-border">
+          <div className="overflow-hidden rounded-xl border border-border">
             <table className="w-full text-left text-sm">
               <thead className="bg-muted">
                 <tr>
@@ -257,7 +262,10 @@ export function BuybackPage() {
               </thead>
               <tbody>
                 {resultRows.map(({ line, resultItem }) => (
-                  <tr key={line.localId} className="border-t border-border">
+                  <tr
+                    key={line.localId}
+                    className="border-t border-border transition-colors hover:bg-gray-50"
+                  >
                     <td className="px-4 py-3 text-gray-900">{line.product.name}</td>
                     <td className="px-4 py-3 text-gray-900">{line.serial_number}</td>
                     <td className="px-4 py-3 tabular-nums text-gray-900">
@@ -313,14 +321,22 @@ export function BuybackPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="text-h1 text-gray-900">Buyback</h1>
+      <div>
+        <h1 className="text-h1 text-gray-900">Buyback</h1>
+        <p className="text-caption text-gray-500">Beli kembali barang dari pelanggan ke stok toko.</p>
+      </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* Left: items */}
         <div className="flex flex-col gap-6 lg:col-span-2">
-          <div className="flex flex-col gap-4 rounded-lg border border-border bg-card p-6 shadow-card">
+          <div className="flex flex-col gap-4 rounded-xl border border-border bg-card p-6 shadow-card">
             <div className="flex items-center justify-between">
-              <h2 className="text-h3 text-gray-900">Item Buyback</h2>
+              <div className="flex items-center gap-2.5">
+                <div className="flex size-7 items-center justify-center rounded-lg bg-gray-100">
+                  <Gem className="size-4 text-gray-600" />
+                </div>
+                <h2 className="text-h3 text-gray-900">Item Buyback</h2>
+              </div>
               <div className="flex items-center gap-2">
                 <Badge variant="outline">{items.length} Item</Badge>
                 <Button
@@ -346,8 +362,13 @@ export function BuybackPage() {
 
         {/* Right: customer, payment, notes, total */}
         <div className="flex flex-col gap-6">
-          <div className="flex flex-col gap-4 rounded-lg border border-border bg-card p-6 shadow-card">
-            <h2 className="text-h3 text-gray-900">Data Pelanggan</h2>
+          <div className="flex flex-col gap-4 rounded-xl border border-border bg-card p-6 shadow-card">
+            <div className="flex items-center gap-2.5">
+              <div className="flex size-7 items-center justify-center rounded-lg bg-gray-100">
+                <Users className="size-4 text-gray-600" />
+              </div>
+              <h2 className="text-h3 text-gray-900">Data Pelanggan</h2>
+            </div>
             <PartyCard
               label="Pilih Pelanggan"
               party={customer}
@@ -357,9 +378,14 @@ export function BuybackPage() {
             />
           </div>
 
-          <div className="flex flex-col gap-4 rounded-lg border border-border bg-card p-6 shadow-card">
+          <div className="flex flex-col gap-4 rounded-xl border border-border bg-card p-6 shadow-card">
             <div className="flex items-center justify-between">
-              <h2 className="text-h3 text-gray-900">Pembayaran</h2>
+              <div className="flex items-center gap-2.5">
+                <div className="flex size-7 items-center justify-center rounded-lg bg-gray-100">
+                  <Wallet className="size-4 text-gray-600" />
+                </div>
+                <h2 className="text-h3 text-gray-900">Pembayaran</h2>
+              </div>
               <OptionToggle
                 name="buyback-payment-mode"
                 value={isCash ? 'CASH' : 'NON_CASH'}
@@ -401,8 +427,11 @@ export function BuybackPage() {
             )}
           </div>
 
-          <div className="flex flex-col gap-1.5 rounded-lg border border-border bg-card p-6 shadow-card">
-            <label htmlFor="buyback-notes" className="text-label text-gray-700">
+          <div className="flex flex-col gap-1.5 rounded-xl border border-border bg-card p-6 shadow-card">
+            <label htmlFor="buyback-notes" className="flex items-center gap-2.5 text-label text-gray-700">
+              <div className="flex size-7 items-center justify-center rounded-lg bg-gray-100">
+                <StickyNote className="size-4 text-gray-600" />
+              </div>
               Catatan
             </label>
             <Textarea
@@ -414,7 +443,7 @@ export function BuybackPage() {
             />
           </div>
 
-          <div className="flex flex-col gap-4 rounded-lg border border-border bg-card p-6 shadow-card">
+          <div className="flex flex-col gap-4 rounded-xl border border-border bg-card p-6 shadow-modal">
             {formError && (
               <p
                 role="alert"
@@ -440,10 +469,17 @@ export function BuybackPage() {
             </div>
             <div>
               <p className="text-caption text-gray-500">Total Pembayaran</p>
-              <p className="text-h2 text-primary">{formatCurrency(grandTotal)}</p>
+              <p className="text-h1 tracking-tight text-primary tabular-nums">
+                {formatCurrency(grandTotal)}
+              </p>
             </div>
 
-            <Button size="lg" onClick={handleCheckout} disabled={checkoutMutation.isPending}>
+            <Button
+              size="lg"
+              onClick={handleCheckout}
+              disabled={checkoutMutation.isPending}
+              className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700"
+            >
               {checkoutMutation.isPending && <Loader2 className="animate-spin" />}
               {checkoutMutation.isPending ? 'Menyimpan...' : 'Simpan Buyback'}
             </Button>

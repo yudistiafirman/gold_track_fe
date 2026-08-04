@@ -1,7 +1,16 @@
 import { useQuery } from '@tanstack/react-query'
-import { ClipboardList, Download, FileBarChart, RotateCcw, Scale, Wallet } from 'lucide-react'
+import {
+  BarChart3,
+  ClipboardList,
+  Download,
+  FileBarChart,
+  RotateCcw,
+  Scale,
+  Wallet,
+} from 'lucide-react'
 import { useState } from 'react'
 import { EmptyState } from '@/components/empty-state'
+import { KpiCard } from '@/components/reports/kpi-card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -128,7 +137,7 @@ export function TransactionsReportPage() {
         </p>
       </div>
 
-      <div className="flex flex-wrap items-end gap-3 rounded-lg border border-border bg-card p-4 shadow-card">
+      <div className="flex flex-wrap items-end gap-3 rounded-xl border border-border bg-card p-4 shadow-card">
         <div className="flex flex-col gap-1.5">
           <label htmlFor="report-from" className="text-label text-gray-700 uppercase">
             Dari Tanggal
@@ -207,7 +216,7 @@ export function TransactionsReportPage() {
           }
         />
       ) : isEmpty ? (
-        <div className="rounded-lg border border-border bg-card shadow-card">
+        <div className="rounded-xl border border-border bg-card shadow-card">
           <EmptyState
             icon={FileBarChart}
             title="Tidak Ada Transaksi"
@@ -227,44 +236,26 @@ export function TransactionsReportPage() {
         report && (
           <>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-              <div className="rounded-lg border border-border bg-card p-4 shadow-card">
-                <div className="flex items-start justify-between">
-                  <p className="text-label text-gray-500 uppercase">Total Transaksi</p>
-                  <div className="rounded-lg bg-primary/10 p-2">
-                    <ClipboardList className="size-5 text-primary" />
-                  </div>
-                </div>
-                <p className="text-h1 tabular-nums text-gray-900">
-                  {report.total.transaction_count.toLocaleString('id-ID')}
-                </p>
-              </div>
-              <div className="rounded-lg border border-border bg-card p-4 shadow-card">
-                <div className="flex items-start justify-between">
-                  <p className="text-label text-gray-500 uppercase">Total Nilai</p>
-                  <div className="rounded-lg bg-primary/10 p-2">
-                    <Wallet className="size-5 text-primary" />
-                  </div>
-                </div>
-                <p className="text-h1 tabular-nums text-gray-900">
-                  {formatCurrency(report.total.total_amount)}
-                </p>
-              </div>
-              <div className="rounded-lg border border-border bg-card p-4 shadow-card">
-                <div className="flex items-start justify-between">
-                  <p className="text-label text-gray-500 uppercase">Total Berat</p>
-                  <div className="rounded-lg bg-primary/10 p-2">
-                    <Scale className="size-5 text-primary" />
-                  </div>
-                </div>
-                <p className="text-h1 tabular-nums text-gray-900">
-                  {report.total.total_weight} gr
-                </p>
-              </div>
+              <KpiCard
+                label="Total Transaksi"
+                value={report.total.transaction_count.toLocaleString('id-ID')}
+                icon={ClipboardList}
+              />
+              <KpiCard
+                label="Total Nilai"
+                value={formatCurrency(report.total.total_amount)}
+                icon={Wallet}
+                tone="primary"
+              />
+              <KpiCard label="Total Berat" value={`${report.total.total_weight} gr`} icon={Scale} />
             </div>
 
             <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-              <div className="overflow-hidden rounded-lg border border-border lg:col-span-2">
-                <div className="border-b border-border bg-accent px-4 py-3">
+              <div className="overflow-hidden rounded-xl border border-border shadow-card lg:col-span-2">
+                <div className="flex items-center gap-2.5 border-b border-border bg-accent px-4 py-3.5">
+                  <div className="flex size-7 items-center justify-center rounded-lg bg-white/60">
+                    <ClipboardList className="size-4 text-green-700" />
+                  </div>
                   <h2 className="text-h3 text-gray-900">Rincian Tipe Transaksi</h2>
                 </div>
                 <Table>
@@ -319,8 +310,13 @@ export function TransactionsReportPage() {
                 </Table>
               </div>
 
-              <div className="flex flex-col gap-4 rounded-lg border border-border bg-card p-4 shadow-card">
-                <h2 className="text-h3 text-gray-900">Distribusi Nilai</h2>
+              <div className="flex flex-col gap-4 rounded-xl border border-border bg-card p-4 shadow-card">
+                <div className="flex items-center gap-2.5">
+                  <div className="flex size-7 items-center justify-center rounded-lg bg-gray-100">
+                    <BarChart3 className="size-4 text-gray-600" />
+                  </div>
+                  <h2 className="text-h3 text-gray-900">Distribusi Nilai</h2>
+                </div>
 
                 {report.breakdown.length === 0 ? (
                   <p className="py-8 text-center text-caption text-gray-500">Tidak ada data.</p>

@@ -20,7 +20,10 @@ export function ExpensesLayout() {
 
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="text-h1 text-gray-900">Pengeluaran</h1>
+      <div>
+        <h1 className="text-h1 text-gray-900">Pengeluaran</h1>
+        <p className="text-caption text-gray-500">Catat dan kelola pengeluaran operasional toko.</p>
+      </div>
 
       <PageTabs
         value={activeTab}

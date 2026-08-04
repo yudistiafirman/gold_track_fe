@@ -90,13 +90,6 @@ export function SimpleMasterList({ resourceKey, endpoint, labelSingular }: Simpl
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex justify-end">
-        <Button onClick={() => setCreateOpen(true)}>
-          <Plus />
-          Tambah {labelSingular}
-        </Button>
-      </div>
-
       <DataTable
         columns={columns}
         data={filteredItems}
@@ -105,6 +98,12 @@ export function SimpleMasterList({ resourceKey, endpoint, labelSingular }: Simpl
         search={search}
         onSearchChange={setSearch}
         searchPlaceholder={`Cari ${lowerLabel}...`}
+        filters={
+          <Button onClick={() => setCreateOpen(true)} className="ml-auto">
+            <Plus />
+            Tambah {labelSingular}
+          </Button>
+        }
         emptyTitle={emptyTitle}
         emptyDescription={emptyDescription}
       />

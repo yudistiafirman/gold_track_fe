@@ -59,13 +59,6 @@ export function ExpenseCategoriesPage() {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex justify-end">
-        <Button onClick={() => setCreateOpen(true)}>
-          <Plus />
-          Tambah Kategori
-        </Button>
-      </div>
-
       <DataTable
         columns={columns}
         data={filteredCategories}
@@ -74,6 +67,12 @@ export function ExpenseCategoriesPage() {
         search={search}
         onSearchChange={setSearch}
         searchPlaceholder="Cari kategori..."
+        filters={
+          <Button onClick={() => setCreateOpen(true)} className="ml-auto">
+            <Plus />
+            Tambah Kategori
+          </Button>
+        }
         emptyTitle={emptyTitle}
         emptyDescription={emptyDescription}
       />

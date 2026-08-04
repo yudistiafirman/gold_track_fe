@@ -1,5 +1,5 @@
 import { useMutation } from '@tanstack/react-query'
-import { Loader2, ScanBarcode, X } from 'lucide-react'
+import { Loader2, ScanBarcode, ShoppingCart, StickyNote, Users, Wallet, X } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
@@ -219,7 +219,9 @@ export function SellPage() {
       cell: (line) =>
         line.item.condition === 'BAD' ? (
           <StatusBadge tone="warning" label="BAD" />
-        ) :  <StatusBadge tone="warning" label="GOOD" />,
+        ) : (
+          <StatusBadge tone="success" label="GOOD" />
+        ),
     },
     {
       id: 'weight',
@@ -277,22 +279,35 @@ export function SellPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="text-h1 text-gray-900">Penjualan</h1>
+      <div>
+        <h1 className="text-h1 text-gray-900">Penjualan</h1>
+        <p className="text-caption text-gray-500">Scan unit, susun keranjang, dan proses pembayaran.</p>
+      </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* Left: scan + cart */}
         <div className="flex flex-col gap-6 lg:col-span-2">
-          <div className="flex flex-col gap-3 rounded-lg border border-border bg-card p-6 shadow-card">
-            <h2 className="text-label text-gray-700 uppercase">Scan Barcode / SKU</h2>
+          <div className="flex flex-col gap-3 rounded-xl border border-primary/20 bg-card p-6 shadow-card">
+            <div className="flex items-center gap-2.5">
+              <div className="flex size-7 items-center justify-center rounded-lg bg-primary/10">
+                <ScanBarcode className="size-4 text-primary" />
+              </div>
+              <h2 className="text-label text-gray-700 uppercase">Scan Barcode / SKU</h2>
+            </div>
             <BarcodeScanInput type={type} onFound={handleFound} />
             <p className="text-caption text-gray-500">
               Tekan &apos;Enter&apos; untuk menambahkan otomatis.
             </p>
           </div>
 
-          <div className="flex flex-col gap-4 rounded-lg border border-border bg-card p-6 shadow-card">
+          <div className="flex flex-col gap-4 rounded-xl border border-border bg-card p-6 shadow-card">
             <div className="flex items-center justify-between">
-              <h2 className="text-h3 text-gray-900">Keranjang</h2>
+              <div className="flex items-center gap-2.5">
+                <div className="flex size-7 items-center justify-center rounded-lg bg-gray-100">
+                  <ShoppingCart className="size-4 text-gray-600" />
+                </div>
+                <h2 className="text-h3 text-gray-900">Keranjang</h2>
+              </div>
               <Badge variant="outline">{lines.length} Item</Badge>
             </div>
             <DataTable
@@ -307,11 +322,16 @@ export function SellPage() {
 
         {/* Right: party, payment, notes, total */}
         <div className="flex flex-col gap-6">
-          <div className="flex flex-col gap-4 rounded-lg border border-border bg-card p-6 shadow-card">
+          <div className="flex flex-col gap-4 rounded-xl border border-border bg-card p-6 shadow-card">
             <div className="flex items-center justify-between">
-              <h2 className="text-h3 text-gray-900">
-                {type === 'SELL' ? 'Data Pelanggan' : 'Data Supplier'}
-              </h2>
+              <div className="flex items-center gap-2.5">
+                <div className="flex size-7 items-center justify-center rounded-lg bg-gray-100">
+                  <Users className="size-4 text-gray-600" />
+                </div>
+                <h2 className="text-h3 text-gray-900">
+                  {type === 'SELL' ? 'Data Pelanggan' : 'Data Supplier'}
+                </h2>
+              </div>
               <OptionToggle
                 name="party-type"
                 value={type}
@@ -343,9 +363,14 @@ export function SellPage() {
             )}
           </div>
 
-          <div className="flex flex-col gap-4 rounded-lg border border-border bg-card p-6 shadow-card">
+          <div className="flex flex-col gap-4 rounded-xl border border-border bg-card p-6 shadow-card">
             <div className="flex items-center justify-between">
-              <h2 className="text-h3 text-gray-900">Pembayaran</h2>
+              <div className="flex items-center gap-2.5">
+                <div className="flex size-7 items-center justify-center rounded-lg bg-gray-100">
+                  <Wallet className="size-4 text-gray-600" />
+                </div>
+                <h2 className="text-h3 text-gray-900">Pembayaran</h2>
+              </div>
               <OptionToggle
                 name="payment-mode"
                 value={isCash ? 'CASH' : 'NON_CASH'}
@@ -387,8 +412,11 @@ export function SellPage() {
             )}
           </div>
 
-          <div className="flex flex-col gap-1.5 rounded-lg border border-border bg-card p-6 shadow-card">
-            <label htmlFor="sell-notes" className="text-label text-gray-700">
+          <div className="flex flex-col gap-1.5 rounded-xl border border-border bg-card p-6 shadow-card">
+            <label htmlFor="sell-notes" className="flex items-center gap-2.5 text-label text-gray-700">
+              <div className="flex size-7 items-center justify-center rounded-lg bg-gray-100">
+                <StickyNote className="size-4 text-gray-600" />
+              </div>
               Catatan
             </label>
             <Textarea
@@ -400,7 +428,7 @@ export function SellPage() {
             />
           </div>
 
-          <div className="flex flex-col gap-4 rounded-lg border border-border bg-card p-6 shadow-card">
+          <div className="flex flex-col gap-4 rounded-xl border border-border bg-card p-6 shadow-modal">
             {formError && (
               <p
                 role="alert"
@@ -428,10 +456,17 @@ export function SellPage() {
             </div>
             <div>
               <p className="text-caption text-gray-500">Total Pembayaran</p>
-              <p className="text-h2 text-primary">{formatCurrency(grandTotal)}</p>
+              <p className="text-h1 tracking-tight text-primary tabular-nums">
+                {formatCurrency(grandTotal)}
+              </p>
             </div>
 
-            <Button size="lg" onClick={handleCheckout} disabled={checkoutMutation.isPending}>
+            <Button
+              size="lg"
+              onClick={handleCheckout}
+              disabled={checkoutMutation.isPending}
+              className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700"
+            >
               {checkoutMutation.isPending ? (
                 <Loader2 className="animate-spin" />
               ) : (

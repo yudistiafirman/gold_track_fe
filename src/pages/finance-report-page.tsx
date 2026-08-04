@@ -4,12 +4,14 @@ import {
   Download,
   FileBarChart,
   Minus,
+  PieChart,
   PiggyBank,
   Receipt,
   RotateCcw,
   ScrollText,
   TrendingDown,
   TrendingUp,
+  Workflow,
 } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { useState } from 'react'
@@ -120,7 +122,7 @@ export function FinanceReportPage() {
         </p>
       </div>
 
-      <div className="flex flex-wrap items-end gap-3 rounded-lg border border-border bg-card p-4 shadow-card">
+      <div className="flex flex-wrap items-end gap-3 rounded-xl border border-border bg-card p-4 shadow-card">
         <div className="flex flex-col gap-1.5">
           <label htmlFor="finance-from" className="text-label text-gray-700 uppercase">
             Dari Tanggal
@@ -180,7 +182,7 @@ export function FinanceReportPage() {
           }
         />
       ) : isEmpty ? (
-        <div className="rounded-lg border border-border bg-card shadow-card">
+        <div className="rounded-xl border border-border bg-card shadow-card">
           <EmptyState
             icon={FileBarChart}
             title="Tidak Ada Data Keuangan"
@@ -226,8 +228,13 @@ export function FinanceReportPage() {
               />
             </div>
 
-            <div className="rounded-lg border border-border bg-card p-4 shadow-card">
-              <h2 className="text-h3 mb-4 text-gray-900">Profit Flow</h2>
+            <div className="rounded-xl border border-border bg-card p-4 shadow-card">
+              <div className="mb-4 flex items-center gap-2.5">
+                <div className="flex size-7 items-center justify-center rounded-lg bg-gray-100">
+                  <Workflow className="size-4 text-gray-600" />
+                </div>
+                <h2 className="text-h3 text-gray-900">Profit Flow</h2>
+              </div>
               <div className="flex flex-wrap items-center gap-2 sm:gap-3">
                 <FlowStep label="Pendapatan" value={report.total_revenue} />
                 <FlowOperator icon={Minus} />
@@ -242,8 +249,11 @@ export function FinanceReportPage() {
             </div>
 
             <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-              <div className="overflow-hidden rounded-lg border border-border">
-                <div className="border-b border-border bg-accent px-4 py-3">
+              <div className="overflow-hidden rounded-xl border border-border shadow-card">
+                <div className="flex items-center gap-2.5 border-b border-border bg-accent px-4 py-3.5">
+                  <div className="flex size-7 items-center justify-center rounded-lg bg-white/60">
+                    <ScrollText className="size-4 text-green-700" />
+                  </div>
                   <h2 className="text-h3 text-gray-900">Rincian Penjualan</h2>
                 </div>
                 {report.sales_breakdown.length === 0 ? (
@@ -301,8 +311,13 @@ export function FinanceReportPage() {
                 )}
               </div>
 
-              <div className="rounded-lg border border-border bg-card p-4 shadow-card">
-                <h2 className="text-h3 mb-4 text-gray-900">Rincian Pengeluaran</h2>
+              <div className="rounded-xl border border-border bg-card p-4 shadow-card">
+                <div className="mb-4 flex items-center gap-2.5">
+                  <div className="flex size-7 items-center justify-center rounded-lg bg-gray-100">
+                    <PieChart className="size-4 text-gray-600" />
+                  </div>
+                  <h2 className="text-h3 text-gray-900">Rincian Pengeluaran</h2>
+                </div>
                 <ExpenseDonutChart
                   data={report.expense_breakdown.map((row) => ({
                     id: row.category.id,
@@ -330,9 +345,9 @@ function FlowStep({ label, value, tone = 'default' }: FlowStepProps) {
   return (
     <div
       className={cn(
-        'flex min-w-24 flex-col items-center gap-0.5 rounded-md px-3 py-2 text-center',
+        'flex min-w-24 flex-col items-center gap-0.5 rounded-lg px-3 py-2 text-center',
         tone === 'neutral' && 'bg-accent',
-        tone === 'primary' && 'bg-primary text-primary-foreground',
+        tone === 'primary' && 'bg-gradient-to-br from-green-500 to-green-700 text-primary-foreground',
       )}
     >
       <span

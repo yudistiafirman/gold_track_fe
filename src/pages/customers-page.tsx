@@ -104,14 +104,9 @@ export function CustomersPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex items-center justify-between">
+      <div>
         <h1 className="text-h1 text-gray-900">Pelanggan</h1>
-        {canCreate && (
-          <Button onClick={() => setCreateOpen(true)}>
-            <Plus />
-            Tambah Pelanggan
-          </Button>
-        )}
+        <p className="text-caption text-gray-500">Kelola data pelanggan toko.</p>
       </div>
       <DataTable
         columns={columns}
@@ -126,6 +121,14 @@ export function CustomersPage() {
           setPage(1)
         }}
         searchPlaceholder="Cari nama/HP..."
+        filters={
+          canCreate && (
+            <Button onClick={() => setCreateOpen(true)} className="ml-auto">
+              <Plus />
+              Tambah Pelanggan
+            </Button>
+          )
+        }
         emptyTitle={emptyTitle}
         emptyDescription={emptyDescription}
       />

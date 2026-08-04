@@ -100,7 +100,7 @@ export function DataTable<T>({
         </div>
       )}
 
-      <div className="overflow-hidden rounded-lg border border-border">
+      <div className="overflow-hidden rounded-xl border border-border shadow-card">
         <Table>
           <TableHeader>
             <TableRow>

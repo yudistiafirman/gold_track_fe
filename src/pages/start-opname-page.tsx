@@ -65,7 +65,7 @@ export function StartOpnamePage() {
 
   if (activeOpname) {
     return (
-      <div className="mx-auto flex w-full max-w-md flex-col items-center gap-4 rounded-lg border border-border bg-card p-8 text-center shadow-card">
+      <div className="mx-auto flex w-full max-w-md flex-col items-center gap-4 rounded-xl border border-border bg-card p-8 text-center shadow-modal">
         <div className="flex size-14 items-center justify-center rounded-full bg-warning/10">
           <ScanBarcode className="size-7 text-warning" />
         </div>
@@ -77,7 +77,11 @@ export function StartOpnamePage() {
           </p>
         </div>
         <div className="flex w-full flex-col gap-2">
-          <Button asChild size="lg">
+          <Button
+            asChild
+            size="lg"
+            className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700"
+          >
             <Link to={`/stock-opnames/${activeOpname.id}/scan`}>
               <Play />
               Lanjutkan Sesi Ini
@@ -103,7 +107,7 @@ export function StartOpnamePage() {
         </Link>
       </Button>
 
-      <div className="flex flex-col gap-6 rounded-lg border border-border bg-card p-8 shadow-card">
+      <div className="flex flex-col gap-6 rounded-xl border border-border bg-card p-8 shadow-modal">
         <div className="flex flex-col items-center gap-3 text-center">
           <div className="flex size-14 items-center justify-center rounded-full bg-primary/10">
             <ScanBarcode className="size-7 text-primary" />
@@ -153,6 +157,7 @@ export function StartOpnamePage() {
           size="lg"
           onClick={() => startMutation.mutate({ notes: notes.trim() || null })}
           disabled={startMutation.isPending}
+          className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700"
         >
           {startMutation.isPending ? <Loader2 className="animate-spin" /> : <Play />}
           {startMutation.isPending ? 'Menyiapkan Sesi...' : 'Mulai Opname'}

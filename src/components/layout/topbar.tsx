@@ -1,5 +1,5 @@
 import { useMutation } from '@tanstack/react-query'
-import { LogOut } from 'lucide-react'
+import { ChevronDown, LogOut } from 'lucide-react'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ConfirmDialog } from '@/components/confirm-dialog'
@@ -42,7 +42,7 @@ export function Topbar() {
   })
 
   return (
-    <header className="flex h-14 shrink-0 items-center justify-between border-b px-4">
+    <header className="flex h-16 shrink-0 items-center justify-between border-b border-border bg-card px-4">
       <div className="flex items-center gap-3">
         <SidebarTrigger />
         <Separator orientation="vertical" className="h-6" />
@@ -51,15 +51,24 @@ export function Topbar() {
 
       {user && (
         <DropdownMenu>
-          <DropdownMenuTrigger className="flex items-center gap-2 rounded-md px-2 py-1 text-sm hover:bg-accent">
-            <Avatar className="size-7">
-              <AvatarFallback>{initials(user.name)}</AvatarFallback>
+          <DropdownMenuTrigger className="flex items-center gap-2.5 rounded-lg px-2 py-1.5 text-sm transition-colors hover:bg-muted">
+            <Avatar className="size-8">
+              <AvatarFallback className="bg-primary font-medium text-primary-foreground">
+                {initials(user.name)}
+              </AvatarFallback>
             </Avatar>
-            <span>{user.name}</span>
+            <div className="hidden flex-col items-start leading-tight sm:flex">
+              <span className="text-label text-gray-900">{user.name}</span>
+              <span className="text-caption text-gray-500">{user.role}</span>
+            </div>
+            <ChevronDown className="size-4 text-muted-foreground" />
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel className="font-normal text-muted-foreground">
-              {user.role}
+          <DropdownMenuContent align="end" className="w-48">
+            <DropdownMenuLabel className="font-normal">
+              <div className="flex flex-col">
+                <span className="text-label text-gray-900">{user.name}</span>
+                <span className="text-caption text-gray-500">{user.role}</span>
+              </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={() => setConfirmOpen(true)}>

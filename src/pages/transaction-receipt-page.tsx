@@ -63,7 +63,10 @@ export function TransactionReceiptPage() {
           Kembali
         </Button>
         {receipt && (
-          <Button onClick={() => printReceipt(receipt)}>
+          <Button
+            onClick={() => printReceipt(receipt)}
+            className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700"
+          >
             <Printer />
             Cetak Struk
           </Button>
@@ -76,7 +79,7 @@ export function TransactionReceiptPage() {
           <Skeleton className="h-48 w-full" />
         </div>
       ) : (
-        <div className="mx-auto flex w-full max-w-2xl flex-col gap-6 rounded-lg border border-border bg-card p-8 shadow-card">
+        <div className="mx-auto flex w-full max-w-2xl flex-col gap-6 rounded-xl border border-border bg-card p-8 shadow-modal">
           <div className="text-center">
             <h1 className="text-h2 text-gray-900">{receipt.store.name}</h1>
             <p className="text-caption text-gray-500">{receipt.store.address}</p>
@@ -112,7 +115,7 @@ export function TransactionReceiptPage() {
             </div>
           </div>
 
-          <div className="overflow-hidden rounded-lg border border-border">
+          <div className="overflow-hidden rounded-xl border border-border">
             <Table>
               <TableHeader>
                 <TableRow>

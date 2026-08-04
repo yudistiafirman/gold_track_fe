@@ -104,7 +104,7 @@ export function ScanOpnamePage() {
   // the session was already closed in another tab.
   if (opname.status !== 'IN_PROGRESS') {
     return (
-      <div className="flex flex-col items-center gap-4 rounded-lg border border-border bg-card p-8 text-center shadow-card">
+      <div className="flex flex-col items-center gap-4 rounded-xl border border-border bg-card p-8 text-center shadow-card">
         <p className="text-body text-gray-700">
           Sesi {opname.opname_code} sudah <strong>{opname.status}</strong> dan tidak bisa discan
           lagi.
@@ -144,38 +144,44 @@ export function ScanOpnamePage() {
             label={opname.status}
           />
         </div>
-        <span className="rounded-md border border-border bg-card px-3 py-1.5 text-body font-medium tabular-nums text-gray-900 shadow-card">
+        <span className="rounded-lg border border-border bg-card px-3 py-1.5 text-body font-medium tabular-nums text-gray-900 shadow-card">
           {opname.opname_code}
         </span>
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <div className="flex items-center justify-between rounded-lg border border-border bg-card p-4 shadow-card">
+        <div className="flex items-center justify-between rounded-xl border border-border bg-card p-4 shadow-card">
           <div>
             <p className="text-caption text-gray-500">Total Discan</p>
             <p className="text-h2 tabular-nums text-gray-900">{totalScanned.toLocaleString('id-ID')}</p>
           </div>
-          <ScanBarcode className="size-6 text-muted-foreground" />
+          <div className="flex size-11 items-center justify-center rounded-full bg-gray-100">
+            <ScanBarcode className="size-5 text-gray-600" />
+          </div>
         </div>
-        <div className="flex items-center justify-between rounded-lg border border-border bg-card p-4 shadow-card">
+        <div className="flex items-center justify-between rounded-xl border border-border bg-card p-4 shadow-card">
           <div>
             <p className="text-caption text-gray-500">Match</p>
             <p className="text-h2 tabular-nums text-success">{counts.match.toLocaleString('id-ID')}</p>
           </div>
-          <CheckCircle2 className="size-6 text-success" />
+          <div className="flex size-11 items-center justify-center rounded-full bg-success/10">
+            <CheckCircle2 className="size-5 text-success" />
+          </div>
         </div>
-        <div className="flex items-center justify-between rounded-lg border border-border bg-card p-4 shadow-card">
+        <div className="flex items-center justify-between rounded-xl border border-border bg-card p-4 shadow-card">
           <div>
             <p className="text-caption text-gray-500">Unexpected</p>
             <p className="text-h2 tabular-nums text-warning">
               {counts.unexpected.toLocaleString('id-ID')}
             </p>
           </div>
-          <ScanBarcode className="size-6 text-warning" />
+          <div className="flex size-11 items-center justify-center rounded-full bg-warning/10">
+            <ScanBarcode className="size-5 text-warning" />
+          </div>
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="flex gap-2 rounded-lg border border-border bg-card p-4 shadow-card">
+      <form onSubmit={handleSubmit} className="flex gap-2 rounded-xl border border-primary/20 bg-card p-4 shadow-card">
         <div className="relative flex-1">
           <ScanBarcode className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
           <Input
@@ -193,8 +199,11 @@ export function ScanOpnamePage() {
         </Button>
       </form>
 
-      <div className="flex flex-col gap-3 rounded-lg border border-border bg-card p-4 shadow-card">
-        <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 rounded-xl border border-border bg-card p-4 shadow-card">
+        <div className="flex items-center gap-2.5">
+          <div className="flex size-7 items-center justify-center rounded-lg bg-gray-100">
+            <CheckCircle2 className="size-4 text-gray-600" />
+          </div>
           <h2 className="text-h3 text-gray-900">Riwayat Scan</h2>
         </div>
 
@@ -203,7 +212,10 @@ export function ScanOpnamePage() {
         ) : (
           <div className="flex flex-col divide-y divide-border">
             {feed.map((entry) => (
-              <div key={entry.key} className="flex items-center justify-between gap-4 py-3">
+              <div
+                key={entry.key}
+                className="flex items-center justify-between gap-4 rounded-lg px-2 py-3 transition-colors hover:bg-gray-50"
+              >
                 <div className="flex items-center gap-4">
                   <span className="w-20 text-caption tabular-nums text-gray-500">{entry.time}</span>
                   <span className="w-24 text-caption tabular-nums text-gray-500">{entry.barcode}</span>
@@ -230,6 +242,7 @@ export function ScanOpnamePage() {
           size="lg"
           onClick={() => completeMutation.mutate()}
           disabled={completeMutation.isPending}
+          className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700"
         >
           {completeMutation.isPending && <Loader2 className="animate-spin" />}
           {completeMutation.isPending ? 'Menyelesaikan...' : 'Selesaikan Opname'}

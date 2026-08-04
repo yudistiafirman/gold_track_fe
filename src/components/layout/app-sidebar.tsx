@@ -1,4 +1,4 @@
-import { ChevronRight } from 'lucide-react'
+import { ChevronRight, Gem } from 'lucide-react'
 import { Link, useLocation } from 'react-router-dom'
 import {
   type NavGroup,
@@ -96,12 +96,14 @@ export function AppSidebar() {
 
   return (
     <Sidebar collapsible="icon">
-      <SidebarHeader>
-        <div className="flex items-center gap-2 px-2 py-1.5 group-data-[collapsible=icon]:px-0">
-          <div className="flex size-6 shrink-0 items-center justify-center rounded-md bg-primary text-primary-foreground text-xs font-semibold">
-            GT
+      <SidebarHeader className="border-b border-sidebar-border">
+        <div className="flex items-center gap-2.5 px-2 py-2 group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:justify-center">
+          <div className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground shadow-sm">
+            <Gem className="size-3.5" />
           </div>
-          <span className="font-semibold group-data-[collapsible=icon]:hidden">Gold Track</span>
+          <span className="text-label font-semibold text-sidebar-foreground group-data-[collapsible=icon]:hidden">
+            GoldTrack
+          </span>
         </div>
       </SidebarHeader>
       <SidebarContent>
@@ -110,7 +112,7 @@ export function AppSidebar() {
         ))}
       </SidebarContent>
       {settingsSections.length > 0 && (
-        <SidebarFooter>
+        <SidebarFooter className="border-t border-sidebar-border">
           {settingsSections.map((section) => (
             <NavSectionGroup key={section.label} section={section} pathname={location.pathname} />
           ))}

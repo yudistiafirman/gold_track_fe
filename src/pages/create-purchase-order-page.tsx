@@ -1,5 +1,5 @@
 import { useMutation } from '@tanstack/react-query'
-import { Loader2, Plus, X } from 'lucide-react'
+import { ClipboardList, Loader2, Plus, StickyNote, Truck, X } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
@@ -138,14 +138,22 @@ export function CreatePurchaseOrderPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="text-h1 text-gray-900">Buat Purchase Order</h1>
+      <div>
+        <h1 className="text-h1 text-gray-900">Buat Purchase Order</h1>
+        <p className="text-caption text-gray-500">Susun pesanan pembelian barang ke supplier.</p>
+      </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* Left: items */}
         <div className="flex flex-col gap-6 lg:col-span-2">
-          <div className="flex flex-col gap-4 rounded-lg border border-border bg-card p-6 shadow-card">
+          <div className="flex flex-col gap-4 rounded-xl border border-border bg-card p-6 shadow-card">
             <div className="flex items-center justify-between">
-              <h2 className="text-h3 text-gray-900">Item PO</h2>
+              <div className="flex items-center gap-2.5">
+                <div className="flex size-7 items-center justify-center rounded-lg bg-gray-100">
+                  <ClipboardList className="size-4 text-gray-600" />
+                </div>
+                <h2 className="text-h3 text-gray-900">Item PO</h2>
+              </div>
               <div className="flex items-center gap-2">
                 <Badge variant="outline">{items.length} Item</Badge>
                 <Button
@@ -171,8 +179,13 @@ export function CreatePurchaseOrderPage() {
 
         {/* Right: supplier, notes, total */}
         <div className="flex flex-col gap-6">
-          <div className="flex flex-col gap-4 rounded-lg border border-border bg-card p-6 shadow-card">
-            <h2 className="text-h3 text-gray-900">Data Supplier</h2>
+          <div className="flex flex-col gap-4 rounded-xl border border-border bg-card p-6 shadow-card">
+            <div className="flex items-center gap-2.5">
+              <div className="flex size-7 items-center justify-center rounded-lg bg-gray-100">
+                <Truck className="size-4 text-gray-600" />
+              </div>
+              <h2 className="text-h3 text-gray-900">Data Supplier</h2>
+            </div>
             <PartyCard
               label="Pilih Supplier"
               party={supplier}
@@ -182,8 +195,11 @@ export function CreatePurchaseOrderPage() {
             />
           </div>
 
-          <div className="flex flex-col gap-1.5 rounded-lg border border-border bg-card p-6 shadow-card">
-            <label htmlFor="po-notes" className="text-label text-gray-700">
+          <div className="flex flex-col gap-1.5 rounded-xl border border-border bg-card p-6 shadow-card">
+            <label htmlFor="po-notes" className="flex items-center gap-2.5 text-label text-gray-700">
+              <div className="flex size-7 items-center justify-center rounded-lg bg-gray-100">
+                <StickyNote className="size-4 text-gray-600" />
+              </div>
               Catatan
             </label>
             <Textarea
@@ -195,7 +211,7 @@ export function CreatePurchaseOrderPage() {
             />
           </div>
 
-          <div className="flex flex-col gap-4 rounded-lg border border-border bg-card p-6 shadow-card">
+          <div className="flex flex-col gap-4 rounded-xl border border-border bg-card p-6 shadow-modal">
             {formError && (
               <p
                 role="alert"
@@ -221,10 +237,17 @@ export function CreatePurchaseOrderPage() {
             </div>
             <div>
               <p className="text-caption text-gray-500">Total PO</p>
-              <p className="text-h2 text-primary">{formatCurrency(grandTotal)}</p>
+              <p className="text-h1 tracking-tight text-primary tabular-nums">
+                {formatCurrency(grandTotal)}
+              </p>
             </div>
 
-            <Button size="lg" onClick={handleSubmit} disabled={createMutation.isPending}>
+            <Button
+              size="lg"
+              onClick={handleSubmit}
+              disabled={createMutation.isPending}
+              className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700"
+            >
               {createMutation.isPending && <Loader2 className="animate-spin" />}
               {createMutation.isPending ? 'Menyimpan...' : 'Buat PO'}
             </Button>

@@ -77,7 +77,10 @@ export function PurchaseOrderDetailPage() {
                 <X />
                 Batalkan
               </Button>
-              <Button asChild>
+              <Button
+                asChild
+                className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700"
+              >
                 <Link to={`/purchase-orders/${po.id}/receive`}>
                   <PackageCheck />
                   Terima Barang
@@ -90,8 +93,13 @@ export function PurchaseOrderDetailPage() {
 
       {po && (
         <div className="flex flex-col gap-4">
-          <h2 className="text-h3 text-gray-900">Item PO</h2>
-          <div className="overflow-hidden rounded-lg border border-border">
+          <div className="flex items-center gap-2.5">
+            <div className="flex size-7 items-center justify-center rounded-lg bg-gray-100">
+              <PackageCheck className="size-4 text-gray-600" />
+            </div>
+            <h2 className="text-h3 text-gray-900">Item PO</h2>
+          </div>
+          <div className="overflow-hidden rounded-xl border border-border shadow-card">
             <Table>
               <TableHeader>
                 <TableRow>

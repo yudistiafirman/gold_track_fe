@@ -143,7 +143,7 @@ export function SettingsPage() {
       </div>
 
       {settingsQuery.isPending ? (
-        <div className="flex max-w-md flex-col gap-5 rounded-lg border border-border bg-card p-6 shadow-card">
+        <div className="flex max-w-md flex-col gap-5 rounded-xl border border-border bg-card p-6 shadow-card">
           <Skeleton className="h-9 w-full" />
           <Skeleton className="h-20 w-full" />
           <Skeleton className="h-9 w-full" />
@@ -163,8 +163,15 @@ export function SettingsPage() {
           <form
             onSubmit={handleSubmit}
             noValidate
-            className="flex max-w-md flex-col gap-5 rounded-lg border border-border bg-card p-6 shadow-card"
+            className="flex max-w-md flex-col gap-5 rounded-xl border border-border bg-card p-6 shadow-card"
           >
+            <div className="flex items-center gap-2.5">
+              <div className="flex size-7 items-center justify-center rounded-lg bg-gray-100">
+                <Store className="size-4 text-gray-600" />
+              </div>
+              <h2 className="text-h3 text-gray-900">Informasi Toko</h2>
+            </div>
+
             {FIELD_CONFIG.map(({ key, label, multiline }) => (
               <FormField
                 key={key}
@@ -210,7 +217,11 @@ export function SettingsPage() {
               >
                 Batalkan Perubahan
               </Button>
-              <Button type="submit" disabled={dirtyKeys.length === 0 || updateMutation.isPending}>
+              <Button
+                type="submit"
+                disabled={dirtyKeys.length === 0 || updateMutation.isPending}
+                className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700"
+              >
                 {updateMutation.isPending && <Loader2 className="animate-spin" />}
                 {updateMutation.isPending ? 'Menyimpan...' : 'Simpan'}
               </Button>

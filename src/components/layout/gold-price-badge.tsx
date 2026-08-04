@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { Coins } from 'lucide-react'
+import { Separator } from '@/components/ui/separator'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { api } from '@/lib/api/client'
@@ -23,7 +24,7 @@ export function GoldPriceBadge() {
   })
 
   if (goldPriceQuery.isPending) {
-    return <Skeleton className="h-6 w-48 rounded-full" />
+    return <Skeleton className="h-8 w-64 rounded-full" />
   }
 
   const price = goldPriceQuery.data
@@ -32,11 +33,23 @@ export function GoldPriceBadge() {
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <div className="flex items-center gap-1.5 rounded-full bg-accent px-3 py-1 text-caption text-accent-foreground">
-          <Coins className="size-3.5" />
-          <span>Beli {formatCurrency(price.price_buy)}</span>
-          <span className="text-gray-400">·</span>
-          <span>Jual {formatCurrency(price.price_sell)}</span>
+        <div className="flex cursor-help items-center gap-3 rounded-full border border-border bg-gray-50 py-1 pr-4 pl-1.5 transition-colors hover:bg-gray-100">
+          <div className="flex size-6 shrink-0 items-center justify-center rounded-full bg-green-100 text-green-700">
+            <Coins className="size-3.5" />
+          </div>
+          <div className="flex items-center gap-1.5">
+            <span className="text-caption text-gray-500">Beli</span>
+            <span className="text-label tabular-nums text-gray-900">
+              {formatCurrency(price.price_buy)}
+            </span>
+          </div>
+          <Separator orientation="vertical" className="h-4" />
+          <div className="flex items-center gap-1.5">
+            <span className="text-caption text-gray-500">Jual</span>
+            <span className="text-label tabular-nums text-gray-900">
+              {formatCurrency(price.price_sell)}
+            </span>
+          </div>
         </div>
       </TooltipTrigger>
       <TooltipContent>

@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import {
   AlertTriangle,
   ArrowRight,
+  CalendarRange,
   ClipboardList,
   ListChecks,
   PiggyBank,
@@ -70,7 +71,8 @@ export function DashboardPage() {
             Ringkasan transaksi, stok, dan keuangan toko.
           </p>
         </div>
-        <div className="flex items-center gap-2 rounded-lg border border-border bg-card p-2 shadow-card">
+        <div className="flex items-center gap-2 rounded-xl border border-border bg-card p-2 shadow-card">
+          <CalendarRange className="ml-1 size-4 shrink-0 text-muted-foreground" />
           <Input
             id="dashboard-from"
             type="date"
@@ -146,15 +148,17 @@ export function DashboardPage() {
             </div>
 
             <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-              <div className="rounded-lg border border-border bg-card shadow-card">
-                <div className="flex items-center justify-between border-b border-border px-4 py-3">
-                  <div className="flex items-center gap-2">
-                    <ListChecks className="size-4 text-gray-500" />
+              <div className="rounded-xl border border-border bg-card shadow-card">
+                <div className="flex items-center justify-between border-b border-border px-4 py-3.5">
+                  <div className="flex items-center gap-2.5">
+                    <div className="flex size-7 items-center justify-center rounded-lg bg-gray-100">
+                      <ListChecks className="size-4 text-gray-600" />
+                    </div>
                     <h2 className="text-h3 text-gray-900">Ringkasan Transaksi</h2>
                   </div>
                   <Link
                     to="/reports/transactions"
-                    className="flex items-center gap-1 text-caption text-primary hover:underline"
+                    className="flex items-center gap-1 text-caption font-medium text-primary hover:underline"
                   >
                     Lihat Detail
                     <ArrowRight className="size-3.5" />
@@ -169,7 +173,10 @@ export function DashboardPage() {
                     {report.transaction_breakdown.map((row) => {
                       const Icon = TRANSACTION_TYPE_ICONS[row.type]
                       return (
-                        <li key={row.type} className="flex items-center justify-between gap-3 px-4 py-3">
+                        <li
+                          key={row.type}
+                          className="flex items-center justify-between gap-3 px-4 py-3 transition-colors hover:bg-gray-50"
+                        >
                           <div className="flex items-center gap-3">
                             <div className="rounded-lg bg-accent p-2">
                               <Icon className="size-4 text-primary" />
@@ -193,10 +200,12 @@ export function DashboardPage() {
                 )}
               </div>
 
-              <div className="rounded-lg border border-border bg-card shadow-card">
-                <div className="flex items-center justify-between border-b border-border px-4 py-3">
-                  <div className="flex items-center gap-2">
-                    <ClipboardList className="size-4 text-gray-500" />
+              <div className="rounded-xl border border-border bg-card shadow-card">
+                <div className="flex items-center justify-between border-b border-border px-4 py-3.5">
+                  <div className="flex items-center gap-2.5">
+                    <div className="flex size-7 items-center justify-center rounded-lg bg-gray-100">
+                      <ClipboardList className="size-4 text-gray-600" />
+                    </div>
                     <h2 className="text-h3 text-gray-900">PO Menunggu Diterima</h2>
                     {report.pending_purchase_orders_total > 0 && (
                       <span className="flex size-6 items-center justify-center rounded-full bg-error/10 text-caption font-semibold text-error">
@@ -213,7 +222,10 @@ export function DashboardPage() {
                   <>
                     <ul className="divide-y divide-border">
                       {report.pending_purchase_orders.map((po) => (
-                        <li key={po.id} className="flex flex-col gap-1 px-4 py-3">
+                        <li
+                          key={po.id}
+                          className="flex flex-col gap-1 px-4 py-3 transition-colors hover:bg-gray-50"
+                        >
                           <div className="flex items-center justify-between gap-2">
                             <Link
                               to={`/purchase-orders/${po.id}`}
@@ -245,10 +257,12 @@ export function DashboardPage() {
               </div>
             </div>
 
-            <div className="overflow-hidden rounded-lg border border-error/20 bg-error/5">
-              <div className="flex items-center justify-between border-b border-error/20 px-4 py-3">
-                <div className="flex items-center gap-2">
-                  <AlertTriangle className="size-4 text-error" />
+            <div className="overflow-hidden rounded-xl border border-error/20 bg-error/5 shadow-card">
+              <div className="flex items-center justify-between border-b border-error/20 px-4 py-3.5">
+                <div className="flex items-center gap-3">
+                  <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-error/10">
+                    <AlertTriangle className="size-4 text-error" />
+                  </div>
                   <div>
                     <h2 className="text-h3 text-gray-900">Stok Menipis</h2>
                     <p className="text-caption text-gray-500">
@@ -264,7 +278,7 @@ export function DashboardPage() {
                   )}
                   <Link
                     to="/reports/stock"
-                    className="flex items-center gap-1 text-caption text-primary hover:underline"
+                    className="flex items-center gap-1 text-caption font-medium text-primary hover:underline"
                   >
                     Lihat Laporan Stok
                     <ArrowRight className="size-3.5" />

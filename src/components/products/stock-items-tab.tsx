@@ -1,5 +1,5 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
-import { Eye, Loader2, Pencil, Plus, Printer, Trash2 } from 'lucide-react'
+import { Boxes, Eye, Loader2, Pencil, Plus, Printer, Trash2 } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { DataTable } from '@/components/data-table/data-table'
 import type { DataTableColumn, PaginationMeta } from '@/components/data-table/types'
@@ -208,33 +208,11 @@ export function StockItemsTab({ productId }: StockItemsTabProps) {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-between">
-        <h2 className="text-h3 text-gray-900">Unit Stok</h2>
-        <div className="flex items-center gap-2">
-          {selectedIds.size > 0 && (
-            <Button
-              variant="secondary"
-              disabled={printLabelsMutation.isPending}
-              onClick={() => {
-                printLabelsMutation.mutate(Array.from(selectedIds))
-                setSelectedIds(new Set())
-              }}
-            >
-              {printLabelsMutation.isPending ? (
-                <Loader2 className="animate-spin" />
-              ) : (
-                <Printer />
-              )}
-              Cetak Label Terpilih ({selectedIds.size})
-            </Button>
-          )}
-          {canCreate && (
-            <Button onClick={() => setCreateOpen(true)}>
-              <Plus />
-              Tambah Unit Stok
-            </Button>
-          )}
+      <div className="flex items-center gap-2.5">
+        <div className="flex size-7 items-center justify-center rounded-lg bg-gray-100">
+          <Boxes className="size-4 text-gray-600" />
         </div>
+        <h2 className="text-h3 text-gray-900">Unit Stok</h2>
       </div>
       <DataTable
         columns={columns}
@@ -254,7 +232,7 @@ export function StockItemsTab({ productId }: StockItemsTabProps) {
         selectedIds={selectedIds}
         onSelectedIdsChange={setSelectedIds}
         filters={
-          <div className="flex gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <Select
               value={status}
               onValueChange={(value) => {
@@ -292,6 +270,32 @@ export function StockItemsTab({ productId }: StockItemsTabProps) {
                 ))}
               </SelectContent>
             </Select>
+
+            <div className="ml-auto flex items-center gap-2">
+              {selectedIds.size > 0 && (
+                <Button
+                  variant="secondary"
+                  disabled={printLabelsMutation.isPending}
+                  onClick={() => {
+                    printLabelsMutation.mutate(Array.from(selectedIds))
+                    setSelectedIds(new Set())
+                  }}
+                >
+                  {printLabelsMutation.isPending ? (
+                    <Loader2 className="animate-spin" />
+                  ) : (
+                    <Printer />
+                  )}
+                  Cetak Label Terpilih ({selectedIds.size})
+                </Button>
+              )}
+              {canCreate && (
+                <Button onClick={() => setCreateOpen(true)}>
+                  <Plus />
+                  Tambah Unit Stok
+                </Button>
+              )}
+            </div>
           </div>
         }
       />

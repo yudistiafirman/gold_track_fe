@@ -1,7 +1,8 @@
 import { useQuery } from '@tanstack/react-query'
-import { AlertTriangle, Download, FileBarChart, Package, RotateCcw, ShieldCheck } from 'lucide-react'
+import { AlertTriangle, Download, FileBarChart, Layers, Package, RotateCcw, ShieldCheck } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { EmptyState } from '@/components/empty-state'
+import { KpiCard } from '@/components/reports/kpi-card'
 import { StatusBadge } from '@/components/status-badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -112,7 +113,7 @@ export function StockReportPage() {
         </p>
       </div>
 
-      <div className="flex flex-wrap items-end gap-3 rounded-lg border border-border bg-card p-4 shadow-card">
+      <div className="flex flex-wrap items-end gap-3 rounded-xl border border-border bg-card p-4 shadow-card">
         <div className="flex flex-col gap-1.5">
           <label htmlFor="report-threshold" className="text-label text-gray-700 uppercase">
             Ambang Batas Stok
@@ -187,7 +188,7 @@ export function StockReportPage() {
           }
         />
       ) : isEmpty ? (
-        <div className="rounded-lg border border-border bg-card shadow-card">
+        <div className="rounded-xl border border-border bg-card shadow-card">
           <EmptyState
             icon={Package}
             title="Belum Ada Data Stok"
@@ -198,43 +199,29 @@ export function StockReportPage() {
         report && (
           <>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-              <div className="rounded-lg border border-border bg-card p-4 shadow-card">
-                <div className="flex items-start justify-between">
-                  <p className="text-label text-gray-500 uppercase">Total Produk</p>
-                  <div className="rounded-lg bg-primary/10 p-2">
-                    <Package className="size-5 text-primary" />
-                  </div>
-                </div>
-                <p className="text-h1 tabular-nums text-gray-900">
-                  {report.items.length.toLocaleString('id-ID')}
-                </p>
-              </div>
-              <div className="rounded-lg border border-border bg-card p-4 shadow-card">
-                <div className="flex items-start justify-between">
-                  <p className="text-label text-gray-500 uppercase">Stok Aman</p>
-                  <div className="rounded-lg bg-green-100 p-2">
-                    <ShieldCheck className="size-5 text-green-700" />
-                  </div>
-                </div>
-                <p className="text-h1 tabular-nums text-gray-900">
-                  {(report.items.length - lowStockCount).toLocaleString('id-ID')}
-                </p>
-              </div>
-              <div className="rounded-lg border border-border bg-card p-4 shadow-card">
-                <div className="flex items-start justify-between">
-                  <p className="text-label text-gray-500 uppercase">Stok Menipis</p>
-                  <div className="rounded-lg bg-error/10 p-2">
-                    <AlertTriangle className="size-5 text-error" />
-                  </div>
-                </div>
-                <p className="text-h1 tabular-nums text-gray-900">
-                  {lowStockCount.toLocaleString('id-ID')}
-                </p>
-              </div>
+              <KpiCard
+                label="Total Produk"
+                value={report.items.length.toLocaleString('id-ID')}
+                icon={Package}
+              />
+              <KpiCard
+                label="Stok Aman"
+                value={(report.items.length - lowStockCount).toLocaleString('id-ID')}
+                icon={ShieldCheck}
+              />
+              <KpiCard
+                label="Stok Menipis"
+                value={lowStockCount.toLocaleString('id-ID')}
+                icon={AlertTriangle}
+                tone="negative"
+              />
             </div>
 
-            <div className="overflow-hidden rounded-lg border border-border">
-              <div className="border-b border-border bg-accent px-4 py-3">
+            <div className="overflow-hidden rounded-xl border border-border shadow-card">
+              <div className="flex items-center gap-2.5 border-b border-border bg-accent px-4 py-3.5">
+                <div className="flex size-7 items-center justify-center rounded-lg bg-white/60">
+                  <Layers className="size-4 text-green-700" />
+                </div>
                 <h2 className="text-h3 text-gray-900">
                   Threshold saat ini: {report.threshold} unit
                 </h2>

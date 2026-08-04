@@ -1,4 +1,5 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
+import { Receipt } from 'lucide-react'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { DataTable } from '@/components/data-table/data-table'
@@ -96,7 +97,12 @@ export function CustomerTransactionHistory({ customerId }: CustomerTransactionHi
 
   return (
     <div className="flex flex-col gap-4">
-      <h2 className="text-h3 text-gray-900">Riwayat Transaksi</h2>
+      <div className="flex items-center gap-2.5">
+        <div className="flex size-7 items-center justify-center rounded-lg bg-gray-100">
+          <Receipt className="size-4 text-gray-600" />
+        </div>
+        <h2 className="text-h3 text-gray-900">Riwayat Transaksi</h2>
+      </div>
       <DataTable
         columns={columns}
         data={transactionsQuery.data?.items ?? []}

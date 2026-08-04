@@ -30,7 +30,10 @@ export function ProductsLayout() {
 
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="text-h1 text-gray-900">Produk</h1>
+      <div>
+        <h1 className="text-h1 text-gray-900">Produk</h1>
+        <p className="text-caption text-gray-500">Kelola katalog produk, kategori, dan brand.</p>
+      </div>
 
       <PageTabs
         value={activeTab}

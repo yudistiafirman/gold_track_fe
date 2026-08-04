@@ -120,7 +120,7 @@ export function OpnameResultPage() {
           <Skeleton className="h-64 w-full" />
         </div>
       ) : opname.status === 'IN_PROGRESS' ? (
-        <div className="flex flex-col items-center gap-4 rounded-lg border border-border bg-card p-8 text-center shadow-card">
+        <div className="flex flex-col items-center gap-4 rounded-xl border border-border bg-card p-8 text-center shadow-card">
           <p className="text-body text-gray-700">
             Sesi {opname.opname_code} masih berjalan — selesaikan sesi untuk melihat ringkasan
             hasil.
@@ -146,32 +146,38 @@ export function OpnameResultPage() {
           </div>
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-            <div className="flex items-center justify-between rounded-lg border border-border bg-card p-4 shadow-card">
+            <div className="flex items-center justify-between rounded-xl border border-border bg-card p-4 shadow-card">
               <div>
                 <p className="text-caption text-gray-500">Match</p>
                 <p className="text-h2 tabular-nums text-success">
                   {opname.summary.match.toLocaleString('id-ID')}
                 </p>
               </div>
-              <CheckCircle2 className="size-6 text-success" />
+              <div className="flex size-11 items-center justify-center rounded-full bg-success/10">
+                <CheckCircle2 className="size-5 text-success" />
+              </div>
             </div>
-            <div className="flex items-center justify-between rounded-lg border border-border bg-card p-4 shadow-card">
+            <div className="flex items-center justify-between rounded-xl border border-border bg-card p-4 shadow-card">
               <div>
                 <p className="text-caption text-gray-500">Missing</p>
                 <p className="text-h2 tabular-nums text-error">
                   {opname.summary.missing.toLocaleString('id-ID')}
                 </p>
               </div>
-              <XCircle className="size-6 text-error" />
+              <div className="flex size-11 items-center justify-center rounded-full bg-error/10">
+                <XCircle className="size-5 text-error" />
+              </div>
             </div>
-            <div className="flex items-center justify-between rounded-lg border border-border bg-card p-4 shadow-card">
+            <div className="flex items-center justify-between rounded-xl border border-border bg-card p-4 shadow-card">
               <div>
                 <p className="text-caption text-gray-500">Unexpected</p>
                 <p className="text-h2 tabular-nums text-warning">
                   {opname.summary.unexpected.toLocaleString('id-ID')}
                 </p>
               </div>
-              <AlertTriangle className="size-6 text-warning" />
+              <div className="flex size-11 items-center justify-center rounded-full bg-warning/10">
+                <AlertTriangle className="size-5 text-warning" />
+              </div>
             </div>
           </div>
 

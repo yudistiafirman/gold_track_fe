@@ -98,12 +98,9 @@ export function UsersPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex items-center justify-between">
+      <div>
         <h1 className="text-h1 text-gray-900">Manajemen User</h1>
-        <Button onClick={() => setCreateOpen(true)}>
-          <Plus />
-          Tambah User
-        </Button>
+        <p className="text-caption text-gray-500">Kelola akun dan peran pengguna sistem.</p>
       </div>
       <DataTable
         columns={columns}
@@ -113,6 +110,12 @@ export function UsersPage() {
         search={search}
         onSearchChange={setSearch}
         searchPlaceholder="Cari nama/email..."
+        filters={
+          <Button onClick={() => setCreateOpen(true)} className="ml-auto">
+            <Plus />
+            Tambah User
+          </Button>
+        }
         emptyTitle={emptyTitle}
         emptyDescription={emptyDescription}
       />

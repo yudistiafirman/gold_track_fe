@@ -124,14 +124,9 @@ export function SuppliersPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex items-center justify-between">
+      <div>
         <h1 className="text-h1 text-gray-900">Supplier</h1>
-        {canCreate && (
-          <Button onClick={() => setCreateOpen(true)}>
-            <Plus />
-            Tambah Supplier
-          </Button>
-        )}
+        <p className="text-caption text-gray-500">Kelola data supplier toko.</p>
       </div>
       <DataTable
         columns={columns}
@@ -146,6 +141,14 @@ export function SuppliersPage() {
           setPage(1)
         }}
         searchPlaceholder="Cari supplier..."
+        filters={
+          canCreate && (
+            <Button onClick={() => setCreateOpen(true)} className="ml-auto">
+              <Plus />
+              Tambah Supplier
+            </Button>
+          )
+        }
         emptyTitle={emptyTitle}
         emptyDescription={emptyDescription}
       />
