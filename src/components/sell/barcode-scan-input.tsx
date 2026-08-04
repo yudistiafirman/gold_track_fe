@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { api } from '@/lib/api/client'
 import { ApiError } from '@/lib/api/error'
+import { focusAfterPaint } from '@/lib/focus-after-paint'
 import type { StockItemLookupResult } from '@/types/stock-item-lookup'
 
 interface BarcodeScanInputProps {
@@ -36,14 +37,14 @@ export function BarcodeScanInput({ type, onFound }: BarcodeScanInputProps) {
     onSuccess: (item) => {
       onFound(item)
       setBarcode('')
-      inputRef.current?.focus()
+      focusAfterPaint(() => inputRef.current?.focus())
     },
     onError: (error) => {
       const message =
         error instanceof ApiError ? error.message : 'Gagal memindai barcode, silakan coba lagi.'
       toast.error(message)
       setBarcode('')
-      inputRef.current?.focus()
+      focusAfterPaint(() => inputRef.current?.focus())
     },
   })
 

@@ -10,8 +10,9 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { api } from '@/lib/api/client'
 import { ApiError } from '@/lib/api/error'
 import { OPNAME_RESULT_TONE, OPNAME_SESSION_STATUS_TONE, resolveStatusTone } from '@/lib/domain-status'
+import { focusAfterPaint } from '@/lib/focus-after-paint'
 import { NotFoundPage } from '@/pages/not-found-page'
-import type { ScanOpnameResult, StockOpname } from '@/types/stock-opname'
+import type { ScanOpnameResult, StockOpname, StockOpnameDetail } from '@/types/stock-opname'
 
 interface ScanFeedEntry extends ScanOpnameResult {
   key: string
@@ -35,7 +36,7 @@ export function ScanOpnamePage() {
 
   const opnameQuery = useQuery({
     queryKey: ['stock-opnames', id],
-    queryFn: () => api.get<StockOpname>(`/stock-opnames/${id}`),
+    queryFn: () => api.get<StockOpnameDetail>(`/stock-opnames/${id}`),
     enabled: id !== undefined,
     retry: false,
   })
@@ -45,12 +46,33 @@ export function ScanOpnamePage() {
   useEffect(() => {
     if (!opname || seeded) return
     setCounts({ match: opname.summary.match, unexpected: opname.summary.unexpected })
+    // Resuming an in-progress session: BE now includes items[] for
+    // IN_PROGRESS too (not just COMPLETED), so re-populate the scan feed
+    // from it instead of starting with an empty list. MISSING can't occur
+    // here (only known once the session completes), but the item type
+    // allows it, so it's filtered out defensively.
+    if (opname.items && opname.items.length > 0) {
+      setFeed(
+        opname.items
+          .filter((item) => item.result !== 'MISSING')
+          .map((item) => ({
+            ...item,
+            result: item.result as 'MATCH' | 'UNEXPECTED',
+            key: item.id,
+            time: item.scanned_at ? new Date(item.scanned_at).toLocaleTimeString('id-ID') : '—',
+          })),
+      )
+    }
     setSeeded(true)
   }, [opname, seeded])
 
   useEffect(() => {
-    inputRef.current?.focus()
-  }, [])
+    // Depends on `opname`, not just mount: the first render (while the
+    // query is still pending) shows the skeleton branch below, so the real
+    // <Input> doesn't exist yet and this ref is still null at that point.
+    if (!opname) return
+    focusAfterPaint(() => inputRef.current?.focus())
+  }, [opname])
 
   const scanMutation = useMutation({
     mutationFn: (payload: ScanPayload) =>
@@ -65,14 +87,14 @@ export function ScanOpnamePage() {
         unexpected: prev.unexpected + (result.result === 'UNEXPECTED' ? 1 : 0),
       }))
       setBarcode('')
-      inputRef.current?.focus()
+      focusAfterPaint(() => inputRef.current?.focus())
     },
     onError: (error) => {
       const message =
         error instanceof ApiError ? error.message : 'Gagal memindai barcode, silakan coba lagi.'
       toast.error(message)
       setBarcode('')
-      inputRef.current?.focus()
+      focusAfterPaint(() => inputRef.current?.focus())
     },
   })
 

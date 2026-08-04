@@ -35,7 +35,7 @@ export interface StockOpnameItem {
   scanned_at?: string | null
 }
 
-/** items is absent while the session is IN_PROGRESS — only populated once the session is COMPLETED. */
+/** items may be absent/omitted depending on the endpoint, but is populated for both IN_PROGRESS (scans so far) and COMPLETED (final result) sessions. */
 export interface StockOpnameDetail extends StockOpname {
   items?: StockOpnameItem[]
 }
