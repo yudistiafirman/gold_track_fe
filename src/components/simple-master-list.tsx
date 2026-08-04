@@ -3,6 +3,7 @@ import { Ban, Pencil, Plus } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { DataTable } from '@/components/data-table/data-table'
 import type { DataTableColumn } from '@/components/data-table/types'
+import { type RowAction, RowActionsMenu } from '@/components/row-actions-menu'
 import { SimpleMasterDeactivateDialog } from '@/components/simple-master-deactivate-dialog'
 import { SimpleMasterFormDialog } from '@/components/simple-master-form-dialog'
 import { StatusBadge } from '@/components/status-badge'
@@ -59,28 +60,22 @@ export function SimpleMasterList({ resourceKey, endpoint, labelSingular }: Simpl
       id: 'actions',
       header: '',
       className: 'w-0',
-      cell: (row) => (
-        <div className="flex justify-end gap-1">
-          <Button
-            variant="ghost"
-            size="icon-sm"
-            aria-label={`Edit ${row.name}`}
-            onClick={() => setEditingId(row.id)}
-          >
-            <Pencil />
-          </Button>
-          {row.is_active && (
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              aria-label={`Nonaktifkan ${row.name}`}
-              onClick={() => setDeactivating({ id: row.id, name: row.name })}
-            >
-              <Ban className="text-error" />
-            </Button>
-          )}
-        </div>
-      ),
+      cell: (row) => {
+        const actions: RowAction[] = [
+          { label: 'Edit', icon: Pencil, onClick: () => setEditingId(row.id) },
+          ...(row.is_active
+            ? [
+                {
+                  label: 'Nonaktifkan',
+                  icon: Ban,
+                  variant: 'destructive' as const,
+                  onClick: () => setDeactivating({ id: row.id, name: row.name }),
+                },
+              ]
+            : []),
+        ]
+        return <RowActionsMenu actions={actions} ariaLabel={`Aksi untuk ${row.name}`} />
+      },
     },
   ]
 

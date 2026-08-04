@@ -3,6 +3,7 @@ import { Pencil, Plus, UserX } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { DataTable } from '@/components/data-table/data-table'
 import type { DataTableColumn } from '@/components/data-table/types'
+import { type RowAction, RowActionsMenu } from '@/components/row-actions-menu'
 import { StatusBadge } from '@/components/status-badge'
 import { Button } from '@/components/ui/button'
 import { CreateUserDialog } from '@/components/users/create-user-dialog'
@@ -68,28 +69,22 @@ export function UsersPage() {
       id: 'actions',
       header: '',
       className: 'w-0',
-      cell: (row) => (
-        <div className="flex justify-end gap-1">
-          <Button
-            variant="ghost"
-            size="icon-sm"
-            aria-label={`Edit ${row.name}`}
-            onClick={() => setEditingUserId(row.id)}
-          >
-            <Pencil />
-          </Button>
-          {row.is_active && row.id !== currentUserId && (
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              aria-label={`Nonaktifkan ${row.name}`}
-              onClick={() => setDeactivatingUser({ id: row.id, name: row.name })}
-            >
-              <UserX className="text-error" />
-            </Button>
-          )}
-        </div>
-      ),
+      cell: (row) => {
+        const actions: RowAction[] = [
+          { label: 'Edit', icon: Pencil, onClick: () => setEditingUserId(row.id) },
+          ...(row.is_active && row.id !== currentUserId
+            ? [
+                {
+                  label: 'Nonaktifkan',
+                  icon: UserX,
+                  variant: 'destructive' as const,
+                  onClick: () => setDeactivatingUser({ id: row.id, name: row.name }),
+                },
+              ]
+            : []),
+        ]
+        return <RowActionsMenu actions={actions} ariaLabel={`Aksi untuk ${row.name}`} />
+      },
     },
   ]
 

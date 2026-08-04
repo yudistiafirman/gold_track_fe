@@ -5,6 +5,7 @@ import type { DataTableColumn } from '@/components/data-table/types'
 import { CreateExpenseCategoryDialog } from '@/components/expenses/create-expense-category-dialog'
 import { DeleteExpenseCategoryDialog } from '@/components/expenses/delete-expense-category-dialog'
 import { EditExpenseCategoryDialog } from '@/components/expenses/edit-expense-category-dialog'
+import { type RowAction, RowActionsMenu } from '@/components/row-actions-menu'
 import { Button } from '@/components/ui/button'
 import { useExpenseCategories } from '@/hooks/use-expense-categories'
 import { ApiError } from '@/lib/api/error'
@@ -33,26 +34,18 @@ export function ExpenseCategoriesPage() {
       id: 'actions',
       header: '',
       className: 'w-0',
-      cell: (row) => (
-        <div className="flex justify-end gap-1">
-          <Button
-            variant="ghost"
-            size="icon-sm"
-            aria-label={`Edit ${row.name}`}
-            onClick={() => setEditingId(row.id)}
-          >
-            <Pencil />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon-sm"
-            aria-label={`Hapus ${row.name}`}
-            onClick={() => setDeletingCategory({ id: row.id, name: row.name })}
-          >
-            <Trash2 className="text-error" />
-          </Button>
-        </div>
-      ),
+      cell: (row) => {
+        const actions: RowAction[] = [
+          { label: 'Edit', icon: Pencil, onClick: () => setEditingId(row.id) },
+          {
+            label: 'Hapus',
+            icon: Trash2,
+            variant: 'destructive',
+            onClick: () => setDeletingCategory({ id: row.id, name: row.name }),
+          },
+        ]
+        return <RowActionsMenu actions={actions} ariaLabel={`Aksi untuk ${row.name}`} />
+      },
     },
   ]
 

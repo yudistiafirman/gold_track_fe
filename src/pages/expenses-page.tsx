@@ -6,6 +6,7 @@ import type { DataTableColumn, PaginationMeta } from '@/components/data-table/ty
 import { CreateExpenseDialog } from '@/components/expenses/create-expense-dialog'
 import { DeleteExpenseDialog } from '@/components/expenses/delete-expense-dialog'
 import { EditExpenseDialog } from '@/components/expenses/edit-expense-dialog'
+import { type RowAction, RowActionsMenu } from '@/components/row-actions-menu'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -77,28 +78,19 @@ export function ExpensesPage() {
         id: 'actions',
         header: '',
         className: 'w-0',
-        cell: (row) => (
-          <div className="flex justify-end gap-1">
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              aria-label={`Edit ${row.description}`}
-              onClick={() => setEditingExpenseId(row.id)}
-            >
-              <Pencil />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              aria-label={`Hapus ${row.description}`}
-              onClick={() =>
-                setDeletingExpense({ id: row.id, description: row.description, amount: row.amount })
-              }
-            >
-              <Trash2 className="text-error" />
-            </Button>
-          </div>
-        ),
+        cell: (row) => {
+          const actions: RowAction[] = [
+            { label: 'Edit', icon: Pencil, onClick: () => setEditingExpenseId(row.id) },
+            {
+              label: 'Hapus',
+              icon: Trash2,
+              variant: 'destructive',
+              onClick: () =>
+                setDeletingExpense({ id: row.id, description: row.description, amount: row.amount }),
+            },
+          ]
+          return <RowActionsMenu actions={actions} ariaLabel={`Aksi untuk ${row.description}`} />
+        },
       },
     ],
     [],

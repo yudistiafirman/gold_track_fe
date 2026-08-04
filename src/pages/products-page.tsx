@@ -7,6 +7,7 @@ import type { DataTableColumn, PaginationMeta } from '@/components/data-table/ty
 import { ArchiveProductDialog } from '@/components/products/archive-product-dialog'
 import { CreateProductDialog } from '@/components/products/create-product-dialog'
 import { EditProductDialog } from '@/components/products/edit-product-dialog'
+import { type RowAction, RowActionsMenu } from '@/components/row-actions-menu'
 import { Button } from '@/components/ui/button'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { useDebouncedValue } from '@/hooks/use-debounced-value'
@@ -88,30 +89,24 @@ export function ProductsPage() {
         id: 'actions',
         header: '',
         className: 'w-0',
-        cell: (row) => (
-          <div className="flex justify-end gap-1">
-            {canUpdate && (
-              <Button
-                variant="ghost"
-                size="icon-sm"
-                aria-label={`Edit ${row.name}`}
-                onClick={() => setEditingProductId(row.id)}
-              >
-                <Pencil />
-              </Button>
-            )}
-            {canDelete && (
-              <Button
-                variant="ghost"
-                size="icon-sm"
-                aria-label={`Arsipkan ${row.name}`}
-                onClick={() => setArchivingProduct({ id: row.id, name: row.name })}
-              >
-                <Trash2 className="text-error" />
-              </Button>
-            )}
-          </div>
-        ),
+        cell: (row) => {
+          const actions: RowAction[] = [
+            ...(canUpdate
+              ? [{ label: 'Edit', icon: Pencil, onClick: () => setEditingProductId(row.id) }]
+              : []),
+            ...(canDelete
+              ? [
+                  {
+                    label: 'Arsipkan',
+                    icon: Trash2,
+                    variant: 'destructive' as const,
+                    onClick: () => setArchivingProduct({ id: row.id, name: row.name }),
+                  },
+                ]
+              : []),
+          ]
+          return <RowActionsMenu actions={actions} ariaLabel={`Aksi untuk ${row.name}`} />
+        },
       })
     }
 

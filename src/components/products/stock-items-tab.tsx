@@ -7,6 +7,7 @@ import { CreateStockItemDialog } from '@/components/products/create-stock-item-d
 import { DeleteStockItemDialog } from '@/components/products/delete-stock-item-dialog'
 import { EditStockItemDialog } from '@/components/products/edit-stock-item-dialog'
 import { StockItemDetailDialog } from '@/components/products/stock-item-detail-dialog'
+import { type RowAction, RowActionsMenu } from '@/components/row-actions-menu'
 import { StatusBadge } from '@/components/status-badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -144,63 +145,54 @@ export function StockItemsTab({ productId }: StockItemsTabProps) {
         id: 'actions',
         header: '',
         className: 'w-0',
-        cell: (row) => (
-          <div className="flex justify-end gap-1">
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              aria-label={`Lihat detail ${row.serial_number}`}
-              onClick={() => setViewingStockItemId(row.id)}
-            >
-              <Eye />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              aria-label={`Cetak label ${row.serial_number}`}
-              disabled={printLabelMutation.isPending && printLabelMutation.variables === row.id}
-              onClick={() => printLabelMutation.mutate(row.id)}
-            >
-              {printLabelMutation.isPending && printLabelMutation.variables === row.id ? (
-                <Loader2 className="animate-spin" />
-              ) : (
-                <Printer />
-              )}
-            </Button>
-            {canUpdate && (
-              <Button
-                variant="ghost"
-                size="icon-sm"
-                aria-label={`Edit ${row.serial_number}`}
-                onClick={() => setEditingStockItemId(row.id)}
-              >
-                <Pencil />
-              </Button>
-            )}
-            {canDelete && (
-              <Button
-                variant="ghost"
-                size="icon-sm"
-                aria-label={`Hapus ${row.serial_number}`}
-                title={
-                  row.status !== 'AVAILABLE'
-                    ? 'Hanya unit AVAILABLE yang bisa dihapus'
-                    : undefined
-                }
-                disabled={row.status !== 'AVAILABLE'}
-                onClick={() =>
-                  setDeletingStockItem({
-                    id: row.id,
-                    serialNumber: row.serial_number,
-                    productId: row.product.id,
-                  })
-                }
-              >
-                <Trash2 className="text-error" />
-              </Button>
-            )}
-          </div>
-        ),
+        cell: (row) => {
+          const isPrinting =
+            printLabelMutation.isPending && printLabelMutation.variables === row.id
+          const actions: RowAction[] = [
+            {
+              label: 'Lihat Detail',
+              icon: Eye,
+              onClick: () => setViewingStockItemId(row.id),
+            },
+            {
+              label: isPrinting ? 'Mencetak...' : 'Cetak Label',
+              icon: isPrinting ? Loader2 : Printer,
+              iconClassName: isPrinting ? 'animate-spin' : undefined,
+              disabled: isPrinting,
+              onClick: () => printLabelMutation.mutate(row.id),
+            },
+            ...(canUpdate
+              ? [
+                  {
+                    label: 'Edit',
+                    icon: Pencil,
+                    onClick: () => setEditingStockItemId(row.id),
+                  },
+                ]
+              : []),
+            ...(canDelete
+              ? [
+                  {
+                    label: 'Hapus',
+                    icon: Trash2,
+                    variant: 'destructive' as const,
+                    disabled: row.status !== 'AVAILABLE',
+                    title:
+                      row.status !== 'AVAILABLE'
+                        ? 'Hanya unit AVAILABLE yang bisa dihapus'
+                        : undefined,
+                    onClick: () =>
+                      setDeletingStockItem({
+                        id: row.id,
+                        serialNumber: row.serial_number,
+                        productId: row.product.id,
+                      }),
+                  },
+                ]
+              : []),
+          ]
+          return <RowActionsMenu actions={actions} ariaLabel={`Aksi untuk ${row.serial_number}`} />
+        },
       },
     ],
     [canUpdate, canDelete, printLabelMutation],

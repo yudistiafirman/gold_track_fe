@@ -7,6 +7,7 @@ import type { DataTableColumn, PaginationMeta } from '@/components/data-table/ty
 import { CreateCustomerDialog } from '@/components/customers/create-customer-dialog'
 import { DeleteCustomerDialog } from '@/components/customers/delete-customer-dialog'
 import { EditCustomerDialog } from '@/components/customers/edit-customer-dialog'
+import { type RowAction, RowActionsMenu } from '@/components/row-actions-menu'
 import { Button } from '@/components/ui/button'
 import { useDebouncedValue } from '@/hooks/use-debounced-value'
 import { api } from '@/lib/api/client'
@@ -69,30 +70,24 @@ export function CustomersPage() {
         id: 'actions',
         header: '',
         className: 'w-0',
-        cell: (row) => (
-          <div className="flex justify-end gap-1">
-            {canUpdate && (
-              <Button
-                variant="ghost"
-                size="icon-sm"
-                aria-label={`Edit ${row.name}`}
-                onClick={() => setEditingCustomerId(row.id)}
-              >
-                <Pencil />
-              </Button>
-            )}
-            {canDelete && (
-              <Button
-                variant="ghost"
-                size="icon-sm"
-                aria-label={`Hapus ${row.name}`}
-                onClick={() => setDeletingCustomer({ id: row.id, name: row.name })}
-              >
-                <Trash2 className="text-error" />
-              </Button>
-            )}
-          </div>
-        ),
+        cell: (row) => {
+          const actions: RowAction[] = [
+            ...(canUpdate
+              ? [{ label: 'Edit', icon: Pencil, onClick: () => setEditingCustomerId(row.id) }]
+              : []),
+            ...(canDelete
+              ? [
+                  {
+                    label: 'Hapus',
+                    icon: Trash2,
+                    variant: 'destructive' as const,
+                    onClick: () => setDeletingCustomer({ id: row.id, name: row.name }),
+                  },
+                ]
+              : []),
+          ]
+          return <RowActionsMenu actions={actions} ariaLabel={`Aksi untuk ${row.name}`} />
+        },
       })
     }
 
