@@ -59,6 +59,7 @@ export function printReceipt(receipt: TransactionReceipt): void {
       body {
         font-family: 'Courier New', Courier, monospace;
         font-size: 11pt;
+        font-weight: 700;
         color: #000;
         width: 8.5in;
       }
