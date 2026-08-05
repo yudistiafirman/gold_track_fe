@@ -9,7 +9,7 @@ export function usePrintStockItemLabel() {
     mutationFn: (stockItemId: string) =>
       api.get<StockItemLabel>(`/stock-items/${stockItemId}/label`),
     onSuccess: (label) => {
-      printStockItemLabel(label)
+      void printStockItemLabel(label)
     },
     onError: (error) => {
       showErrorToast(error, 'Gagal memuat data label.')
@@ -24,7 +24,7 @@ export function usePrintStockItemLabels() {
         stockItemIds.map((id) => api.get<StockItemLabel>(`/stock-items/${id}/label`)),
       ),
     onSuccess: (labels) => {
-      printStockItemLabels(labels)
+      void printStockItemLabels(labels)
     },
     onError: (error) => {
       showErrorToast(error, 'Gagal memuat data label untuk salah satu unit.')
