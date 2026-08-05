@@ -50,8 +50,7 @@ interface CheckoutPayload {
 }
 
 function lineTotal(line: SellCartLine): number {
-  const pricePerGram = Number(line.pricePerGram || 0)
-  return pricePerGram * line.item.product.weight_gram
+  return Number(line.unitPrice || 0)
 }
 
 export function SellPage() {
@@ -68,7 +67,7 @@ export function SellPage() {
   const setSupplier = useSellCartStore((state) => state.setSupplier)
   const addItem = useSellCartStore((state) => state.addItem)
   const removeItem = useSellCartStore((state) => state.removeItem)
-  const setPricePerGram = useSellCartStore((state) => state.setPricePerGram)
+  const setUnitPrice = useSellCartStore((state) => state.setUnitPrice)
   const setPaymentMethod = useSellCartStore((state) => state.setPaymentMethod)
   const setPaymentRef = useSellCartStore((state) => state.setPaymentRef)
   const setNotes = useSellCartStore((state) => state.setNotes)
@@ -236,17 +235,17 @@ export function SellPage() {
       className: 'text-table-num',
     },
     {
-      id: 'price_per_gram',
-      header: 'Harga/gr',
+      id: 'unit_price',
+      header: 'Harga/Unit',
       cell: (line) => (
         <Input
           type="text"
           inputMode="numeric"
           placeholder="0"
-          value={formatThousands(line.pricePerGram)}
+          value={formatThousands(line.unitPrice)}
           onChange={(event) => {
             const digits = event.target.value.replace(/\D/g, '')
-            setPricePerGram(line.item.id, digits)
+            setUnitPrice(line.item.id, digits)
           }}
           disabled={checkoutMutation.isPending}
           className="w-32"

@@ -51,8 +51,7 @@ interface BuybackCheckoutPayload {
 }
 
 function lineTotal(line: BuybackItemLine): number {
-  const pricePerGram = Number(line.pricePerGram || 0)
-  return pricePerGram * line.product.weight_gram
+  return Number(line.unitPrice || 0)
 }
 
 export function BuybackPage() {
@@ -191,9 +190,9 @@ export function BuybackPage() {
       className: 'text-table-num',
     },
     {
-      id: 'price_per_gram',
-      header: 'Harga/gr',
-      cell: (line) => formatCurrency(Number(line.pricePerGram || 0)),
+      id: 'unit_price',
+      header: 'Harga/Unit',
+      cell: (line) => formatCurrency(Number(line.unitPrice || 0)),
       className: 'text-table-num',
     },
     {

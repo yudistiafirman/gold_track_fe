@@ -121,7 +121,6 @@ export function TransactionReceiptPage() {
                 <TableRow>
                   <TableHead>Produk</TableHead>
                   <TableHead>Berat</TableHead>
-                  <TableHead>Hrg/gr</TableHead>
                   <TableHead>Subtotal</TableHead>
                 </TableRow>
               </TableHeader>
@@ -137,9 +136,6 @@ export function TransactionReceiptPage() {
                       </div>
                     </TableCell>
                     <TableCell className="text-table-num">{item.weight_gram} gr</TableCell>
-                    <TableCell className="text-table-num">
-                      {formatCurrency(item.price_per_gram)}
-                    </TableCell>
                     <TableCell className="text-table-num">
                       {formatCurrency(item.price_total)}
                     </TableCell>

@@ -19,7 +19,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import type { StockCondition } from '@/lib/domain-status'
-import { formatCurrency, formatThousands } from '@/lib/format'
+import { formatThousands } from '@/lib/format'
 import { PRODUCTION_YEAR_MAX, PRODUCTION_YEAR_MIN, validateProductionYear } from '@/lib/production-year'
 import { useBuybackCartStore } from '@/store/buyback-cart-store'
 import type { Product } from '@/types/product'
@@ -34,7 +34,7 @@ interface FormValues {
   serialNumber: string
   condition: StockCondition | ''
   productionYear: string
-  pricePerGram: string
+  unitPrice: string
 }
 
 interface FormErrors {
@@ -42,11 +42,11 @@ interface FormErrors {
   serial_number?: string
   condition?: string
   production_year?: string
-  price_per_gram?: string
+  unit_price?: string
 }
 
 function createInitialValues(): FormValues {
-  return { product: null, serialNumber: '', condition: '', productionYear: '', pricePerGram: '' }
+  return { product: null, serialNumber: '', condition: '', productionYear: '', unitPrice: '' }
 }
 
 /**
@@ -74,11 +74,11 @@ export function AddBuybackItemDialog({ open, onOpenChange }: AddBuybackItemDialo
     if (!values.product) validationErrors.product = 'Produk wajib dipilih'
     if (!values.serialNumber.trim()) validationErrors.serial_number = 'Serial number wajib diisi'
     if (!values.condition) validationErrors.condition = 'Kondisi wajib dipilih'
-    const pricePerGram = Number(values.pricePerGram)
-    if (!values.pricePerGram.trim()) {
-      validationErrors.price_per_gram = 'Harga beli per gram wajib diisi'
-    } else if (Number.isNaN(pricePerGram) || pricePerGram <= 0) {
-      validationErrors.price_per_gram = 'Harga beli per gram harus berupa angka lebih dari 0'
+    const unitPrice = Number(values.unitPrice)
+    if (!values.unitPrice.trim()) {
+      validationErrors.unit_price = 'Harga beli per unit wajib diisi'
+    } else if (Number.isNaN(unitPrice) || unitPrice <= 0) {
+      validationErrors.unit_price = 'Harga beli per unit harus berupa angka lebih dari 0'
     }
     const productionYearError = validateProductionYear(values.productionYear)
     if (productionYearError) validationErrors.production_year = productionYearError
@@ -95,16 +95,12 @@ export function AddBuybackItemDialog({ open, onOpenChange }: AddBuybackItemDialo
       serial_number: values.serialNumber.trim(),
       condition: values.condition,
       production_year: values.productionYear.trim() ? Number(values.productionYear) : null,
-      pricePerGram: values.pricePerGram,
+      unitPrice: values.unitPrice,
     })
 
     setValues(createInitialValues())
     setErrors({})
   }
-
-  const computedSubtotal = values.product
-    ? Number(values.pricePerGram || 0) * values.product.weight_gram
-    : 0
 
   return (
     <>
@@ -195,25 +191,21 @@ export function AddBuybackItemDialog({ open, onOpenChange }: AddBuybackItemDialo
             </FormField>
 
             <FormField
-              label="Harga Beli / Gram"
+              label="Harga Beli / Unit"
               htmlFor="buyback-item-price"
               required
-              error={errors.price_per_gram}
-              description={
-                values.product
-                  ? `Berat ${values.product.weight_gram} gr · Subtotal ${formatCurrency(computedSubtotal)}`
-                  : undefined
-              }
+              error={errors.unit_price}
+              description={values.product ? `Berat ${values.product.weight_gram} gr` : undefined}
             >
               <Input
                 id="buyback-item-price"
                 type="text"
                 inputMode="numeric"
                 placeholder="0"
-                value={formatThousands(values.pricePerGram)}
+                value={formatThousands(values.unitPrice)}
                 onChange={(event) => {
                   const digits = event.target.value.replace(/\D/g, '')
-                  setValues((prev) => ({ ...prev, pricePerGram: digits }))
+                  setValues((prev) => ({ ...prev, unitPrice: digits }))
                 }}
               />
             </FormField>

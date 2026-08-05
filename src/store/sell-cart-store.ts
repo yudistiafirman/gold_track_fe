@@ -11,8 +11,8 @@ export interface SellPartyRef {
 
 export interface SellCartLine {
   item: StockItemLookupResult
-  /** Raw digits, matching the thousands-formatted price input pattern used elsewhere. */
-  pricePerGram: string
+  /** Raw digits, matching the thousands-formatted price input pattern used elsewhere. Total price for the unit, not per gram. */
+  unitPrice: string
   /** True only if the item required (FE-703) and went through the BAD-condition confirm modal. */
   confirmed: boolean
 }
@@ -34,7 +34,7 @@ interface SellCartState extends SellCartValues {
   /** Returns false (cart unchanged) if the unit is already in the cart. */
   addItem: (item: StockItemLookupResult, confirmed?: boolean) => boolean
   removeItem: (stockItemId: string) => void
-  setPricePerGram: (stockItemId: string, value: string) => void
+  setUnitPrice: (stockItemId: string, value: string) => void
   setPaymentMethod: (value: string) => void
   setPaymentRef: (value: string) => void
   setNotes: (value: string) => void
@@ -69,7 +69,7 @@ export const useSellCartStore = create<SellCartState>()(
           return false
         }
         set((state) => ({
-          lines: [...state.lines, { item, pricePerGram: '', confirmed }],
+          lines: [...state.lines, { item, unitPrice: '', confirmed }],
         }))
         return true
       },
@@ -77,10 +77,10 @@ export const useSellCartStore = create<SellCartState>()(
         set((state) => ({
           lines: state.lines.filter((line) => line.item.id !== stockItemId),
         })),
-      setPricePerGram: (stockItemId, value) =>
+      setUnitPrice: (stockItemId, value) =>
         set((state) => ({
           lines: state.lines.map((line) =>
-            line.item.id === stockItemId ? { ...line, pricePerGram: value } : line,
+            line.item.id === stockItemId ? { ...line, unitPrice: value } : line,
           ),
         })),
       setPaymentMethod: (value) => set({ paymentMethod: value }),
