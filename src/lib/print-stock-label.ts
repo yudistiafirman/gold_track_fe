@@ -1,4 +1,4 @@
-import QRCode from 'qrcode'
+import JsBarcode from 'jsbarcode'
 import type { StockItemLabel } from '@/types/stock-item'
 
 function escapeHtml(value: string): string {
@@ -10,29 +10,33 @@ function escapeHtml(value: string): string {
     .replace(/'/g, '&#39;')
 }
 
-// Kept small so product name + value + serial text still fit within the
-// 25mm-tall label alongside it. Error correction 'M' is the standard
-// reliability/density balance — verify actual scan reliability against the
-// XP-420B print output before resizing further.
-const QR_SIZE_MM = 12
+// Store's handheld scanners only read 1D symbologies, so labels use CODE128
+// (full ASCII support) instead of a QR code. Sized to fit the 50mm-wide
+// label alongside the product name and serial text on a 25mm-tall label.
+const BARCODE_WIDTH_MM = 40
+const BARCODE_HEIGHT_MM = 10
 
-export async function renderQrCodeSvg(value: string): Promise<string> {
-  const svgString = await QRCode.toString(value, {
-    type: 'svg',
+export function renderBarcodeSvg(value: string): string {
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
+  JsBarcode(svg, value, {
+    format: 'CODE128',
+    displayValue: false,
     margin: 0,
-    errorCorrectionLevel: 'M',
+    height: 40,
   })
-  const svg = new DOMParser().parseFromString(svgString, 'image/svg+xml').documentElement
-  svg.setAttribute('width', `${QR_SIZE_MM}mm`)
-  svg.setAttribute('height', `${QR_SIZE_MM}mm`)
+  svg.setAttribute('width', `${BARCODE_WIDTH_MM}mm`)
+  svg.setAttribute('height', `${BARCODE_HEIGHT_MM}mm`)
+  // Non-uniform scaling only changes bar height, not the width ratios between
+  // bars that CODE128 decoding depends on — safe for a 1D symbology (unlike QR).
+  svg.setAttribute('preserveAspectRatio', 'none')
   return new XMLSerializer().serializeToString(svg)
 }
 
-async function renderLabelHtml(label: StockItemLabel): Promise<string> {
-  const qrSvg = await renderQrCodeSvg(label.barcode)
+function renderLabelHtml(label: StockItemLabel): string {
+  const barcodeSvg = renderBarcodeSvg(label.barcode)
   return `<div class="label">
     <div class="product-name">${escapeHtml(label.product_name)}</div>
-    ${qrSvg}
+    ${barcodeSvg}
     <div class="barcode-value">${escapeHtml(label.barcode)}</div>
     <div class="serial">${escapeHtml(label.serial_number)}</div>
   </div>`
@@ -111,13 +115,12 @@ function openPrintWindow(html: string): void {
  * XP-420B. The OS printer driver still needs a matching 50x25mm media/stock
  * size configured — this only controls what the browser sends to print.
  */
-export async function printStockItemLabel(label: StockItemLabel): Promise<void> {
-  openPrintWindow(buildLabelDocument([await renderLabelHtml(label)]))
+export function printStockItemLabel(label: StockItemLabel): void {
+  openPrintWindow(buildLabelDocument([renderLabelHtml(label)]))
 }
 
 /** Same as printStockItemLabel, but queues multiple labels as one print job (one page per label). */
-export async function printStockItemLabels(labels: StockItemLabel[]): Promise<void> {
+export function printStockItemLabels(labels: StockItemLabel[]): void {
   if (labels.length === 0) return
-  const labelsHtml = await Promise.all(labels.map(renderLabelHtml))
-  openPrintWindow(buildLabelDocument(labelsHtml))
+  openPrintWindow(buildLabelDocument(labels.map(renderLabelHtml)))
 }
