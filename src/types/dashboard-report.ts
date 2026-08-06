@@ -10,6 +10,13 @@ export interface DashboardPendingPurchaseOrder {
   created_at: string
 }
 
+export interface CashSummary {
+  total_gold_value: number
+  total_balance: number
+  total_external_funds: number
+  total_external_debts: number
+}
+
 export interface DashboardReport {
   from: string
   to: string
@@ -20,4 +27,5 @@ export interface DashboardReport {
   low_stock_items: StockReportItem[]
   pending_purchase_orders: DashboardPendingPurchaseOrder[]
   pending_purchase_orders_total: number
+  cash_summary: CashSummary
 }

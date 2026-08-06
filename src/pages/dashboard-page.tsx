@@ -4,11 +4,15 @@ import {
   ArrowRight,
   CalendarRange,
   ClipboardList,
+  Coins,
+  HandCoins,
+  Landmark,
   ListChecks,
   PiggyBank,
   Receipt,
   ScrollText,
   TrendingUp,
+  Wallet,
 } from 'lucide-react'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
@@ -121,6 +125,38 @@ export function DashboardPage() {
       ) : (
         report && (
           <>
+            <div className="rounded-xl border border-border bg-card shadow-card">
+              <div className="border-b border-border px-4 py-3.5">
+                <h2 className="text-h3 text-gray-900">Ringkasan Kas</h2>
+                <p className="text-caption text-gray-500">
+                  Snapshot kondisi kas saat ini — tidak berubah oleh filter tanggal di atas.
+                </p>
+              </div>
+              <div className="grid grid-cols-1 gap-4 p-4 sm:grid-cols-2 lg:grid-cols-4">
+                <KpiCard
+                  label="Total Uang Emas"
+                  value={formatCurrency(report.cash_summary.total_gold_value)}
+                  icon={Coins}
+                />
+                <KpiCard
+                  label="Total Saldo"
+                  value={formatCurrency(report.cash_summary.total_balance)}
+                  icon={Wallet}
+                />
+                <KpiCard
+                  label="Uang Diluar"
+                  value={formatCurrency(report.cash_summary.total_external_funds)}
+                  icon={HandCoins}
+                />
+                <KpiCard
+                  label="Hutang Diluar"
+                  value={formatCurrency(report.cash_summary.total_external_debts)}
+                  icon={Landmark}
+                  tone="negative"
+                />
+              </div>
+            </div>
+
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
               <KpiCard
                 label="Total Pendapatan"

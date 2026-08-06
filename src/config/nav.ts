@@ -12,6 +12,7 @@ import {
   Truck,
   UserCog,
   Users,
+  Wallet,
 } from 'lucide-react'
 import { ROLES, type Role } from '@/types/role'
 
@@ -109,6 +110,17 @@ export const NAV_SECTIONS: NavSection[] = [
           { title: 'Transaksi', url: '/reports/transactions' },
           { title: 'Stok', url: '/reports/stock' },
           { title: 'Keuangan', url: '/reports/finance' },
+        ],
+      },
+      {
+        type: 'group',
+        title: 'Kas',
+        icon: Wallet,
+        roles: SUPER_ADMIN_ROLES,
+        children: [
+          { title: 'Saldo Uang', url: '/balance-accounts' },
+          { title: 'Uang Diluar', url: '/external-funds' },
+          { title: 'Hutang Diluar', url: '/external-debts' },
         ],
       },
     ],

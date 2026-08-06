@@ -5,6 +5,7 @@ import { RoleGuard } from '@/app/role-guard'
 import { RootLayout } from '@/app/root-layout'
 import { AppLayout } from '@/components/layout/app-layout'
 import { ADMIN_ROLES, SUPER_ADMIN_ROLES } from '@/config/nav'
+import { BalanceAccountsPage } from '@/pages/balance-accounts-page'
 import { BuybackPage } from '@/pages/buyback-page'
 import { CreatePurchaseOrderPage } from '@/pages/create-purchase-order-page'
 import { CustomerDetailPage } from '@/pages/customer-detail-page'
@@ -14,6 +15,8 @@ import { DesignSystemPage } from '@/pages/design-system-page'
 import { ExpenseCategoriesPage } from '@/pages/expense-categories-page'
 import { ExpensesLayout } from '@/pages/expenses-layout'
 import { ExpensesPage } from '@/pages/expenses-page'
+import { ExternalDebtsPage } from '@/pages/external-debts-page'
+import { ExternalFundsPage } from '@/pages/external-funds-page'
 import { FinanceReportPage } from '@/pages/finance-report-page'
 import { ForbiddenPage } from '@/pages/forbidden-page'
 import { LoginPage } from '@/pages/login-page'
@@ -109,6 +112,9 @@ export const router = createBrowserRouter([
                   { path: 'reports/stock', element: <StockReportPage /> },
                   { path: 'reports/finance', element: <FinanceReportPage /> },
                   { path: 'users', element: <UsersPage /> },
+                  { path: 'balance-accounts', element: <BalanceAccountsPage /> },
+                  { path: 'external-funds', element: <ExternalFundsPage /> },
+                  { path: 'external-debts', element: <ExternalDebtsPage /> },
                 ],
               },
             ],
