@@ -31,6 +31,7 @@ export function DeleteExternalFundDialog({ fund, onClose }: DeleteExternalFundDi
     mutationFn: () => api.delete<{ message: string }>(`/external-funds/${fund?.id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['external-funds'] })
+      queryClient.invalidateQueries({ queryKey: ['reports', 'dashboard'] })
       showSuccessToast('Uang diluar berhasil dihapus.')
       handleClose()
     },

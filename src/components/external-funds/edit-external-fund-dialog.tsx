@@ -68,6 +68,7 @@ export function EditExternalFundDialog({ fundId, onClose }: EditExternalFundDial
       api.put<ExternalFund, UpdateExternalFundPayload>(`/external-funds/${fundId}`, payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['external-funds'] })
+      queryClient.invalidateQueries({ queryKey: ['reports', 'dashboard'] })
       showSuccessToast('Uang diluar berhasil diperbarui.')
       handleClose()
     },

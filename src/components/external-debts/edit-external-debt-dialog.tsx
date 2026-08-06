@@ -68,6 +68,7 @@ export function EditExternalDebtDialog({ debtId, onClose }: EditExternalDebtDial
       api.put<ExternalDebt, UpdateExternalDebtPayload>(`/external-debts/${debtId}`, payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['external-debts'] })
+      queryClient.invalidateQueries({ queryKey: ['reports', 'dashboard'] })
       showSuccessToast('Hutang diluar berhasil diperbarui.')
       handleClose()
     },

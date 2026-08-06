@@ -31,6 +31,7 @@ export function DeleteBalanceAccountDialog({ account, onClose }: DeleteBalanceAc
     mutationFn: () => api.delete<{ message: string }>(`/balance-accounts/${account?.id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['balance-accounts'] })
+      queryClient.invalidateQueries({ queryKey: ['reports', 'dashboard'] })
       showSuccessToast(`Saldo "${account?.name}" berhasil dihapus.`)
       handleClose()
     },

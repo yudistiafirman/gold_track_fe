@@ -68,6 +68,7 @@ export function EditBalanceAccountDialog({ accountId, onClose }: EditBalanceAcco
       ),
     onSuccess: (account) => {
       queryClient.invalidateQueries({ queryKey: ['balance-accounts'] })
+      queryClient.invalidateQueries({ queryKey: ['reports', 'dashboard'] })
       showSuccessToast(`Saldo "${account.name}" berhasil diperbarui.`)
       handleClose()
     },

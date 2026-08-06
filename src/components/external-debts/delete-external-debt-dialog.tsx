@@ -31,6 +31,7 @@ export function DeleteExternalDebtDialog({ debt, onClose }: DeleteExternalDebtDi
     mutationFn: () => api.delete<{ message: string }>(`/external-debts/${debt?.id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['external-debts'] })
+      queryClient.invalidateQueries({ queryKey: ['reports', 'dashboard'] })
       showSuccessToast(`Hutang "${debt?.debtor_name}" berhasil dihapus.`)
       handleClose()
     },

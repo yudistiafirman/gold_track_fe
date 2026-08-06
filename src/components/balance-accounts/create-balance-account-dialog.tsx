@@ -49,6 +49,7 @@ export function CreateBalanceAccountDialog({
       api.post<BalanceAccount, CreateBalanceAccountPayload>('/balance-accounts', payload),
     onSuccess: (account) => {
       queryClient.invalidateQueries({ queryKey: ['balance-accounts'] })
+      queryClient.invalidateQueries({ queryKey: ['reports', 'dashboard'] })
       showSuccessToast(`Saldo "${account.name}" berhasil ditambahkan.`)
       handleClose()
     },

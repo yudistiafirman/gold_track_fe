@@ -46,6 +46,7 @@ export function CreateExternalDebtDialog({ open, onOpenChange }: CreateExternalD
       api.post<ExternalDebt, CreateExternalDebtPayload>('/external-debts', payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['external-debts'] })
+      queryClient.invalidateQueries({ queryKey: ['reports', 'dashboard'] })
       showSuccessToast('Hutang diluar berhasil ditambahkan.')
       handleClose()
     },

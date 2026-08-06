@@ -46,6 +46,7 @@ export function CreateExternalFundDialog({ open, onOpenChange }: CreateExternalF
       api.post<ExternalFund, CreateExternalFundPayload>('/external-funds', payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['external-funds'] })
+      queryClient.invalidateQueries({ queryKey: ['reports', 'dashboard'] })
       showSuccessToast('Uang diluar berhasil ditambahkan.')
       handleClose()
     },
