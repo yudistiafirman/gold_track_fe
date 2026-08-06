@@ -77,7 +77,6 @@ export const router = createBrowserRouter([
               {
                 element: <RoleGuard roles={ADMIN_ROLES} />,
                 children: [
-                  { path: 'dashboard', element: <DashboardPage /> },
                   { path: 'suppliers', element: <SuppliersPage /> },
                   { path: 'suppliers/:id', element: <SupplierDetailPage /> },
                   { path: 'purchase-orders', element: <PurchaseOrdersPage /> },
@@ -99,15 +98,16 @@ export const router = createBrowserRouter([
                       { path: 'categories', element: <ExpenseCategoriesPage /> },
                     ],
                   },
-                  { path: 'reports/transactions', element: <TransactionsReportPage /> },
-                  { path: 'reports/stock', element: <StockReportPage /> },
-                  { path: 'reports/finance', element: <FinanceReportPage /> },
                   { path: 'settings', element: <SettingsPage /> },
                 ],
               },
               {
                 element: <RoleGuard roles={SUPER_ADMIN_ROLES} />,
                 children: [
+                  { path: 'dashboard', element: <DashboardPage /> },
+                  { path: 'reports/transactions', element: <TransactionsReportPage /> },
+                  { path: 'reports/stock', element: <StockReportPage /> },
+                  { path: 'reports/finance', element: <FinanceReportPage /> },
                   { path: 'users', element: <UsersPage /> },
                 ],
               },

@@ -52,7 +52,7 @@ export const NAV_SECTIONS: NavSection[] = [
         title: 'Dashboard',
         url: '/dashboard',
         icon: LayoutDashboard,
-        roles: ADMIN_ROLES,
+        roles: SUPER_ADMIN_ROLES,
       },
     ],
   },
@@ -104,7 +104,7 @@ export const NAV_SECTIONS: NavSection[] = [
         type: 'group',
         title: 'Laporan',
         icon: FileBarChart,
-        roles: ADMIN_ROLES,
+        roles: SUPER_ADMIN_ROLES,
         children: [
           { title: 'Transaksi', url: '/reports/transactions' },
           { title: 'Stok', url: '/reports/stock' },
