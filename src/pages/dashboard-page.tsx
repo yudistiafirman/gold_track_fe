@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import {
   AlertTriangle,
   ArrowRight,
+  Banknote,
   CalendarRange,
   ClipboardList,
   Coins,
@@ -132,7 +133,18 @@ export function DashboardPage() {
                   Snapshot kondisi kas saat ini — tidak berubah oleh filter tanggal di atas.
                 </p>
               </div>
-              <div className="grid grid-cols-1 gap-4 p-4 sm:grid-cols-2 lg:grid-cols-4">
+              <div className="grid grid-cols-1 gap-4 p-4 sm:grid-cols-2 lg:grid-cols-5">
+                <KpiCard
+                  label="Total Kas"
+                  value={formatCurrency(
+                    report.cash_summary.total_gold_value +
+                      report.cash_summary.total_balance +
+                      report.cash_summary.total_external_funds +
+                      report.cash_summary.total_external_debts,
+                  )}
+                  icon={Banknote}
+                  tone="primary"
+                />
                 <KpiCard
                   label="Total Uang Emas"
                   value={formatCurrency(report.cash_summary.total_gold_value)}
