@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { api } from '@/lib/api/client'
 import { ApiError } from '@/lib/api/error'
+import { networkRetryDelay, retryOnNetworkError } from '@/lib/api/retry'
 import { focusAfterPaint } from '@/lib/focus-after-paint'
 import type { StockItemLookupResult } from '@/types/stock-item-lookup'
 
@@ -34,6 +35,8 @@ export function BarcodeScanInput({ type, onFound }: BarcodeScanInputProps) {
       api.get<StockItemLookupResult>('/stock-items/lookup', {
         params: { barcode: code, type },
       }),
+    retry: retryOnNetworkError,
+    retryDelay: networkRetryDelay,
     onSuccess: (item) => {
       onFound(item)
       setBarcode('')
@@ -64,14 +67,18 @@ export function BarcodeScanInput({ type, onFound }: BarcodeScanInputProps) {
           ref={inputRef}
           value={barcode}
           onChange={(event) => setBarcode(event.target.value)}
-          placeholder="Scan atau ketik barcode..."
+          placeholder={
+            lookupMutation.isPending && lookupMutation.failureCount > 0
+              ? 'Koneksi lambat, mencoba lagi...'
+              : 'Scan atau ketik barcode...'
+          }
           className="pl-9"
           disabled={lookupMutation.isPending}
         />
       </div>
       <Button type="submit" disabled={lookupMutation.isPending}>
         {lookupMutation.isPending ? <Loader2 className="animate-spin" /> : <ScanBarcode />}
-        Scan
+        {lookupMutation.isPending && lookupMutation.failureCount > 0 ? 'Mencoba lagi...' : 'Scan'}
       </Button>
     </form>
   )

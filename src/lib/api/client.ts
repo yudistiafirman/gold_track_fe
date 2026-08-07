@@ -7,6 +7,10 @@ import { ApiError } from './error'
 
 export const httpClient = axios.create({
   baseURL: env.apiBaseUrl,
+  // Safety net for flaky wifi: without this, a stalled connection hangs the
+  // request (and any UI spinner tied to it) indefinitely instead of failing
+  // fast into the retry/error path below.
+  timeout: 15000,
 })
 
 httpClient.interceptors.request.use((config) => {

@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
 import { api } from '@/lib/api/client'
 import { ApiError } from '@/lib/api/error'
+import { networkRetryDelay, retryOnNetworkError } from '@/lib/api/retry'
 import { OPNAME_RESULT_TONE, OPNAME_SESSION_STATUS_TONE, resolveStatusTone } from '@/lib/domain-status'
 import { focusAfterPaint } from '@/lib/focus-after-paint'
 import { NotFoundPage } from '@/pages/not-found-page'
@@ -77,6 +78,8 @@ export function ScanOpnamePage() {
   const scanMutation = useMutation({
     mutationFn: (payload: ScanPayload) =>
       api.post<ScanOpnameResult, ScanPayload>(`/stock-opnames/${id}/scan`, payload),
+    retry: retryOnNetworkError,
+    retryDelay: networkRetryDelay,
     onSuccess: (result) => {
       setFeed((prev) => [
         { ...result, key: crypto.randomUUID(), time: new Date().toLocaleTimeString('id-ID') },
@@ -210,14 +213,18 @@ export function ScanOpnamePage() {
             ref={inputRef}
             value={barcode}
             onChange={(event) => setBarcode(event.target.value)}
-            placeholder="Scan atau ketik barcode..."
+            placeholder={
+              scanMutation.isPending && scanMutation.failureCount > 0
+                ? 'Koneksi lambat, mencoba lagi...'
+                : 'Scan atau ketik barcode...'
+            }
             className="pl-9"
             disabled={scanMutation.isPending}
           />
         </div>
         <Button type="submit" disabled={scanMutation.isPending}>
           {scanMutation.isPending ? <Loader2 className="animate-spin" /> : <ScanBarcode />}
-          Scan
+          {scanMutation.isPending && scanMutation.failureCount > 0 ? 'Mencoba lagi...' : 'Scan'}
         </Button>
       </form>
 
