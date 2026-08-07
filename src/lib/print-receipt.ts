@@ -53,7 +53,7 @@ export function printReceipt(receipt: TransactionReceipt): void {
     <meta charset="utf-8" />
     <title>Struk ${escapeHtml(receipt.transaction_code)}</title>
     <style>
-      @page { size: 9.5in 11in; margin: 0.5in; }
+      @page { size: 9.5in 5.5in; margin: 0.2in 0.5in; }
       * { box-sizing: border-box; }
       html, body { margin: 0; padding: 0; }
       body {
@@ -66,30 +66,30 @@ export function printReceipt(receipt: TransactionReceipt): void {
       .center { text-align: center; }
       .muted { color: #444; font-size: 9pt; }
       .store-name { font-size: 15pt; font-weight: 700; letter-spacing: 1px; }
-      .rule { border-top: 1px dashed #000; margin: 10px 0; }
-      .rule-double { border-top: 3px double #000; margin: 10px 0; }
-      .title { font-size: 13pt; font-weight: 700; letter-spacing: 2px; margin: 6px 0; }
-      .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 6px; }
-      .meta-table td { padding: 1px 0; vertical-align: top; }
+      .rule { border-top: 1px dashed #000; margin: 3px 0; }
+      .rule-double { border-top: 3px double #000; margin: 3px 0; }
+      .title { font-size: 13pt; font-weight: 700; letter-spacing: 2px; margin: 3px 0; }
+      .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 3px; }
+      .meta-table td { padding: 0; vertical-align: top; }
       .meta-table td.label { width: 1.6in; }
       .meta-table td.colon { width: 0.2in; }
-      table.items { width: 100%; border-collapse: collapse; margin: 8px 0; }
+      table.items { width: 100%; border-collapse: collapse; margin: 3px 0; }
       table.items th, table.items td {
         border-bottom: 1px solid #000;
-        padding: 4px 6px;
+        padding: 1px 4px;
         text-align: left;
         vertical-align: top;
       }
       table.items thead th { border-bottom: 2px solid #000; font-weight: 700; }
       table.items td.num, table.items th.num { text-align: right; white-space: nowrap; }
-      .totals-table { width: 100%; border-collapse: collapse; margin-top: 4px; }
-      .totals-table td { padding: 2px 0; }
+      .totals-table { width: 100%; border-collapse: collapse; margin-top: 2px; }
+      .totals-table td { padding: 1px 0; }
       .totals-table td.value { text-align: right; }
-      .totals-table tr.grand td { font-size: 13pt; font-weight: 700; border-top: 2px solid #000; padding-top: 6px; }
-      .signatures { width: 100%; border-collapse: collapse; margin-top: 0.35in; page-break-inside: avoid; }
-      .signatures td { text-align: center; padding-top: 0.35in; }
-      .signatures .line { border-top: 1px solid #000; margin: 0 0.4in; padding-top: 4px; }
-      .footer { text-align: center; margin-top: 0.2in; font-size: 9pt; page-break-inside: avoid; }
+      .totals-table tr.grand td { font-size: 13pt; font-weight: 700; border-top: 2px solid #000; padding-top: 2px; }
+      .signatures { width: 100%; border-collapse: collapse; margin-top: 0.1in; page-break-inside: avoid; }
+      .signatures td { text-align: center; padding-top: 0.1in; }
+      .signatures .line { border-top: 1px solid #000; margin: 0 0.4in; padding-top: 2px; }
+      .footer { text-align: center; margin-top: 0.08in; font-size: 9pt; page-break-inside: avoid; }
     </style>
   </head>
   <body>
