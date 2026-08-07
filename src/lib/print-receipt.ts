@@ -86,10 +86,10 @@ export function printReceipt(receipt: TransactionReceipt): void {
       .totals-table td { padding: 2px 0; }
       .totals-table td.value { text-align: right; }
       .totals-table tr.grand td { font-size: 13pt; font-weight: 700; border-top: 2px solid #000; padding-top: 6px; }
-      .signatures { width: 100%; border-collapse: collapse; margin-top: 0.6in; }
-      .signatures td { text-align: center; padding-top: 0.6in; }
+      .signatures { width: 100%; border-collapse: collapse; margin-top: 0.35in; page-break-inside: avoid; }
+      .signatures td { text-align: center; padding-top: 0.35in; }
       .signatures .line { border-top: 1px solid #000; margin: 0 0.4in; padding-top: 4px; }
-      .footer { text-align: center; margin-top: 0.3in; font-size: 9pt; }
+      .footer { text-align: center; margin-top: 0.2in; font-size: 9pt; page-break-inside: avoid; }
     </style>
   </head>
   <body>
