@@ -1,7 +1,9 @@
 import { useQuery } from '@tanstack/react-query'
-import { ArrowLeft, Printer } from 'lucide-react'
+import { ArrowLeft, Printer, X } from 'lucide-react'
+import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { StatusBadge } from '@/components/status-badge'
+import { CancelTransactionDialog } from '@/components/transactions/cancel-transaction-dialog'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import {
@@ -15,6 +17,7 @@ import {
 import { api } from '@/lib/api/client'
 import { TRANSACTION_STATUS_TONE, resolveStatusTone } from '@/lib/domain-status'
 import { formatCurrency, formatDate } from '@/lib/format'
+import { useCan } from '@/lib/permissions'
 import { printReceipt } from '@/lib/print-receipt'
 import { NotFoundPage } from '@/pages/not-found-page'
 import type { TransactionReceipt, TransactionType } from '@/types/transaction-receipt'
@@ -32,6 +35,10 @@ function resolveParty(receipt: TransactionReceipt) {
 export function TransactionReceiptPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
+  const canCancel = useCan('delete', 'transactions')
+  const [cancelling, setCancelling] = useState<{ id: string; transactionCode: string } | null>(
+    null,
+  )
 
   const receiptQuery = useQuery({
     queryKey: ['transactions', id, 'receipt'],
@@ -63,13 +70,26 @@ export function TransactionReceiptPage() {
           Kembali
         </Button>
         {receipt && (
-          <Button
-            onClick={() => printReceipt(receipt)}
-            className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700"
-          >
-            <Printer />
-            Cetak Struk
-          </Button>
+          <div className="flex items-center gap-2">
+            {canCancel && receipt.status === 'COMPLETED' && (
+              <Button
+                variant="secondary"
+                onClick={() =>
+                  setCancelling({ id: receipt.id, transactionCode: receipt.transaction_code })
+                }
+              >
+                <X />
+                Batalkan Transaksi
+              </Button>
+            )}
+            <Button
+              onClick={() => printReceipt(receipt)}
+              className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700"
+            >
+              <Printer />
+              Cetak Struk
+            </Button>
+          </div>
         )}
       </div>
 
@@ -161,6 +181,8 @@ export function TransactionReceiptPage() {
           </div>
         </div>
       )}
+
+      <CancelTransactionDialog transaction={cancelling} onClose={() => setCancelling(null)} />
     </div>
   )
 }

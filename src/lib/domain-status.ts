@@ -9,6 +9,7 @@ export const PO_STATUS_TONE = {
 export const STOCK_STATUS_TONE = {
   AVAILABLE: 'success',
   SOLD: 'gray',
+  VOID: 'gray',
 } as const satisfies Record<string, StatusTone>
 
 export const STOCK_CONDITION_TONE = {
@@ -32,9 +33,9 @@ export const PHYSICAL_STATUS_TONE = {
   NOT_FOUND: 'error',
 } as const satisfies Record<string, StatusTone>
 
-/** Only COMPLETED is documented so far (FE-303) — other transaction statuses fall back to 'gray' via resolveStatusTone. */
 export const TRANSACTION_STATUS_TONE = {
   COMPLETED: 'success',
+  CANCELLED: 'gray',
 } as const satisfies Record<string, StatusTone>
 
 /** Higher privilege reads more prominent — matches the badge-color intent used across the app's tone maps. */
