@@ -34,7 +34,7 @@ export function DeleteStockItemDialog({ stockItem, onClose }: DeleteStockItemDia
       queryClient.invalidateQueries({
         queryKey: ['products', stockItem?.productId, 'stock-items'],
       })
-      showSuccessToast(`Unit ${stockItem?.serialNumber} berhasil dihapus.`)
+      showSuccessToast(`Unit ${stockItem?.serialNumber} berhasil diarsipkan.`)
       handleClose()
     },
   })
@@ -47,20 +47,21 @@ export function DeleteStockItemDialog({ stockItem, onClose }: DeleteStockItemDia
   const errorMessage = deleteMutation.isError
     ? deleteMutation.error instanceof ApiError
       ? deleteMutation.error.message
-      : 'Gagal menghapus unit stok, silakan coba lagi.'
+      : 'Gagal mengarsipkan unit stok, silakan coba lagi.'
     : null
 
   return (
     <Dialog open={open} onOpenChange={(next) => !next && handleClose()}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Hapus unit stok?</DialogTitle>
+          <DialogTitle>Arsipkan unit stok?</DialogTitle>
           <DialogDescription>
             {stockItem && (
               <>
                 Unit dengan serial number{' '}
                 <span className="font-medium text-gray-900">{stockItem.serialNumber}</span> akan
-                dihapus permanen.
+                diarsipkan dan disembunyikan dari daftar. Data tetap tersimpan untuk keperluan
+                histori.
               </>
             )}
           </DialogDescription>
@@ -91,7 +92,7 @@ export function DeleteStockItemDialog({ stockItem, onClose }: DeleteStockItemDia
             disabled={deleteMutation.isPending}
           >
             {deleteMutation.isPending && <Loader2 className="animate-spin" />}
-            {deleteMutation.isPending ? 'Menghapus...' : 'Hapus'}
+            {deleteMutation.isPending ? 'Mengarsipkan...' : 'Arsipkan'}
           </Button>
         </DialogFooter>
       </DialogContent>

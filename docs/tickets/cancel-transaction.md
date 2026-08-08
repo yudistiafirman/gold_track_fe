@@ -43,10 +43,15 @@ endpoint baru buat membatalkannya, dengan efek balik ke stok yang beda tergantun
 - Tidak ada alasan/notes wajib diisi saat cancel — endpoint-nya `POST` tanpa body sama sekali.
 - Tidak ada batasan waktu (mis. "cuma bisa cancel di hari yang sama") — ini keputusan sengaja dari
   client, cancel bisa dilakukan kapan saja selama status masih `COMPLETED`.
-- `VOID` **tidak** ditambahkan sebagai opsi di filter status dropdown stock items
+- ~~`VOID` **tidak** ditambahkan sebagai opsi di filter status dropdown stock items
   (`stock-items-tab.tsx`) — backend juga sengaja tidak mengizinkan `?status=VOID` sebagai filter
   query (cuma `AVAILABLE`/`SOLD` yang valid). Unit `VOID` tetap muncul kalau filter status = "Semua
-  status", cuma tidak bisa difilter khusus.
+  status", cuma tidak bisa difilter khusus.~~ **[UPDATE 2026-08-08 — sudah tidak berlaku, lihat
+  tiket `archive-stock-item.md`]** Backend sekarang mengizinkan `?status=VOID` (dan `?status=
+  ARCHIVED`) sebagai filter query — jadi filter dropdown-nya *boleh* ditambah kalau mau, meski
+  tetap opsional/nice-to-have, bukan wajib. Yang **wajib** diperhatikan: unit `VOID` **tidak lagi**
+  otomatis muncul di list "Semua status" (tanpa `?status=`) — sekarang harus difilter eksplisit
+  `?status=VOID` buat lihatnya. Detail lengkap & alasannya ada di `archive-stock-item.md`.
 
 ## Role & akses
 
@@ -131,9 +136,16 @@ tidak perlu logic tambahan di FE untuk bedain kasus ini dari 409 "sudah dibatalk
 - `GET /api/transactions/{id}`, `.../receipt`, dan riwayat transaksi customer/supplier — field
   `status` sekarang bisa bernilai `"CANCELLED"` selain `"COMPLETED"` yang sudah ada.
 - `GET /api/stock-items/{id}` dan list stock items — field `status` sekarang bisa bernilai
-  `"VOID"` selain `"AVAILABLE"`/`"SOLD"` yang sudah ada. Unit `VOID` **tidak pernah** balik ke
-  status lain, dan tidak terhitung sebagai stok tersedia di manapun (nilai stok di dashboard, hasil
-  pencarian/lookup pas checkout, dsb — semua ini backend yang jaga, FE tidak perlu filter manual).
+  `"VOID"` selain `"AVAILABLE"`/`"SOLD"` yang sudah ada (dan sejak `archive-stock-item.md`, juga
+  bisa `"ARCHIVED"`). Unit `VOID` **tidak pernah** balik ke status lain lewat cancel — satu
+  pengecualian: kalau unit `VOID` itu **diarsipkan lalu transaksi BUY aslinya dibatalkan lagi**,
+  dia balik jadi `VOID` juga (no-op secara terlihat, tapi teknisnya lewat `ARCHIVED` dulu, lihat
+  tiket archive). `VOID` tidak terhitung sebagai stok tersedia di manapun (nilai stok di dashboard,
+  hasil pencarian/lookup pas checkout, dsb — semua ini backend yang jaga, FE tidak perlu filter
+  manual). **[UPDATE 2026-08-08]** Beda dari yang ditulis sebelumnya di sini: `VOID` **tidak lagi
+  otomatis muncul** di list stock items tanpa filter (`?status=` kosong) — sekarang harus
+  `?status=VOID` eksplisit. Lihat `archive-stock-item.md` buat detail lengkap kenapa (unit `VOID`
+  dan `ARCHIVED` sama-sama "mati", jadi sama-sama disembunyikan dari list default).
 
 ---
 
@@ -158,6 +170,12 @@ export const STOCK_STATUS_TONE = {
 `StockStatus`/`TransactionStatus`-nya (kalau ada) otomatis ikut melebar karena keduanya derived
 via `keyof typeof ...` — cek `src/types/stock-item.ts` (`status: StockStatus`) tetap valid tanpa
 perubahan lain.
+
+**[UPDATE 2026-08-08]** Kalau tiket ini dikerjakan **setelah** `archive-stock-item.md`,
+`STOCK_STATUS_TONE` di atas kemungkinan sudah punya entry `ARCHIVED` juga — tinggal tambahin
+`VOID` di situ, gak perlu bikin ulang objeknya. Kalau dikerjakan **sebelum** `archive-stock-item.md`,
+biarin snippet di atas apa adanya (cukup `VOID`), nanti `ARCHIVED` ditambah belakangan lewat tiket
+itu.
 
 ### 2. Dialog — `src/components/transactions/cancel-transaction-dialog.tsx` (baru)
 Copy 1:1 pola `src/components/purchase-orders/cancel-purchase-order-dialog.tsx` (sudah ada,

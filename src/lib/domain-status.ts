@@ -10,6 +10,7 @@ export const STOCK_STATUS_TONE = {
   AVAILABLE: 'success',
   SOLD: 'gray',
   VOID: 'gray',
+  ARCHIVED: 'gray',
 } as const satisfies Record<string, StatusTone>
 
 export const STOCK_CONDITION_TONE = {

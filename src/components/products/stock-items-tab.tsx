@@ -170,13 +170,13 @@ export function StockItemsTab({ productId }: StockItemsTabProps) {
             ...(canDelete
               ? [
                   {
-                    label: 'Hapus',
+                    label: 'Arsipkan',
                     icon: Trash2,
                     variant: 'destructive' as const,
                     disabled: row.status !== 'AVAILABLE',
                     title:
                       row.status !== 'AVAILABLE'
-                        ? 'Hanya unit AVAILABLE yang bisa dihapus'
+                        ? 'Hanya unit AVAILABLE yang bisa diarsipkan'
                         : undefined,
                     onClick: () =>
                       setDeletingStockItem({
