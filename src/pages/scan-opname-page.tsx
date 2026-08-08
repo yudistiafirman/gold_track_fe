@@ -3,6 +3,7 @@ import { ArrowLeft, CheckCircle2, Loader2, ScanBarcode } from 'lucide-react'
 import { type SubmitEvent, useEffect, useRef, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { toast } from 'sonner'
+import { ConfirmDialog } from '@/components/confirm-dialog'
 import { StatusBadge } from '@/components/status-badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -15,7 +16,7 @@ import { focusAfterPaint } from '@/lib/focus-after-paint'
 import { NotFoundPage } from '@/pages/not-found-page'
 import type { ScanOpnameResult, StockOpname, StockOpnameDetail } from '@/types/stock-opname'
 
-interface ScanFeedEntry extends ScanOpnameResult {
+interface ScanFeedEntry extends Omit<ScanOpnameResult, 'not_scanned'> {
   key: string
   time: string
 }
@@ -32,8 +33,9 @@ export function ScanOpnamePage() {
 
   const [barcode, setBarcode] = useState('')
   const [feed, setFeed] = useState<ScanFeedEntry[]>([])
-  const [counts, setCounts] = useState({ match: 0, unexpected: 0 })
+  const [counts, setCounts] = useState({ match: 0, unexpected: 0, notScanned: 0 })
   const [seeded, setSeeded] = useState(false)
+  const [showCompleteConfirm, setShowCompleteConfirm] = useState(false)
 
   const opnameQuery = useQuery({
     queryKey: ['stock-opnames', id],
@@ -46,7 +48,11 @@ export function ScanOpnamePage() {
 
   useEffect(() => {
     if (!opname || seeded) return
-    setCounts({ match: opname.summary.match, unexpected: opname.summary.unexpected })
+    setCounts({
+      match: opname.summary.match,
+      unexpected: opname.summary.unexpected,
+      notScanned: opname.summary.not_scanned,
+    })
     // Resuming an in-progress session: BE now includes items[] for
     // IN_PROGRESS too (not just COMPLETED), so re-populate the scan feed
     // from it instead of starting with an empty list. MISSING can't occur
@@ -88,6 +94,7 @@ export function ScanOpnamePage() {
       setCounts((prev) => ({
         match: prev.match + (result.result === 'MATCH' ? 1 : 0),
         unexpected: prev.unexpected + (result.result === 'UNEXPECTED' ? 1 : 0),
+        notScanned: result.not_scanned,
       }))
       setBarcode('')
       focusAfterPaint(() => inputRef.current?.focus())
@@ -151,6 +158,14 @@ export function ScanOpnamePage() {
     scanMutation.mutate({ barcode: trimmed })
   }
 
+  function handleCompleteClick() {
+    if (counts.notScanned > 0) {
+      setShowCompleteConfirm(true)
+      return
+    }
+    completeMutation.mutate()
+  }
+
   const totalScanned = counts.match + counts.unexpected
 
   const errorMessage = completeMutation.isError
@@ -174,7 +189,7 @@ export function ScanOpnamePage() {
         </span>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-4">
         <div className="flex items-center justify-between rounded-xl border border-border bg-card p-4 shadow-card">
           <div>
             <p className="text-caption text-gray-500">Total Discan</p>
@@ -202,6 +217,17 @@ export function ScanOpnamePage() {
           </div>
           <div className="flex size-11 items-center justify-center rounded-full bg-warning/10">
             <ScanBarcode className="size-5 text-warning" />
+          </div>
+        </div>
+        <div className="flex items-center justify-between rounded-xl border border-border bg-card p-4 shadow-card">
+          <div>
+            <p className="text-caption text-gray-500">Belum Discan</p>
+            <p className="text-h2 tabular-nums text-gray-900">
+              {counts.notScanned.toLocaleString('id-ID')}
+            </p>
+          </div>
+          <div className="flex size-11 items-center justify-center rounded-full bg-gray-100">
+            <ScanBarcode className="size-5 text-gray-400" />
           </div>
         </div>
       </div>
@@ -269,7 +295,7 @@ export function ScanOpnamePage() {
       <div className="flex justify-end">
         <Button
           size="lg"
-          onClick={() => completeMutation.mutate()}
+          onClick={handleCompleteClick}
           disabled={completeMutation.isPending}
           className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700"
         >
@@ -277,6 +303,20 @@ export function ScanOpnamePage() {
           {completeMutation.isPending ? 'Menyelesaikan...' : 'Selesaikan Opname'}
         </Button>
       </div>
+
+      <ConfirmDialog
+        open={showCompleteConfirm}
+        onOpenChange={setShowCompleteConfirm}
+        title="Masih ada unit yang belum discan"
+        description={`Masih ada ${counts.notScanned.toLocaleString('id-ID')} unit yang belum discan. Unit yang belum discan akan otomatis tercatat sebagai MISSING begitu opname diselesaikan. Yakin ingin melanjutkan?`}
+        confirmLabel="Selesaikan Opname"
+        variant="destructive"
+        isLoading={completeMutation.isPending}
+        onConfirm={() => {
+          setShowCompleteConfirm(false)
+          completeMutation.mutate()
+        }}
+      />
     </div>
   )
 }

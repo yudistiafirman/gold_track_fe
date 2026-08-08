@@ -4,6 +4,7 @@ export interface StockOpnameSummary {
   match: number
   missing: number
   unexpected: number
+  not_scanned: number
 }
 
 export interface StockOpname {
@@ -49,4 +50,5 @@ export interface ScanOpnameResult {
   system_status: StockStatus
   physical_status: PhysicalStatus
   result: Extract<OpnameResult, 'MATCH' | 'UNEXPECTED'>
+  not_scanned: number
 }
