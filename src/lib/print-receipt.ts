@@ -23,12 +23,12 @@ function resolveParty(receipt: TransactionReceipt) {
 /**
  * Opens a print dialog formatted for the store's actual receipt setup: an
  * EPSON LX-300+II dot-matrix printer on 9.5x11in continuous (fanfold) form,
- * split down the middle into two ~4.5in-wide panels. Plain monospace + rule
- * lines rather than logos/graphics — dot-matrix raster printing is slow and
- * unreliable on this class of printer, so this sticks to what prints
- * cleanly and fast. The OS printer driver still needs the continuous-form
- * stock (and matching custom paper size) configured — this only controls
- * what the browser sends to print.
+ * perforated in half ("bagi 2") into 9.5x5.5in sections. Plain monospace +
+ * rule lines rather than logos/graphics — dot-matrix raster printing is
+ * slow and unreliable on this class of printer, so this sticks to what
+ * prints cleanly and fast. The OS printer driver still needs the
+ * continuous-form stock (and a matching 9.5x5.5in custom paper size)
+ * configured — this only controls what the browser sends to print.
  */
 export function printReceipt(receipt: TransactionReceipt): void {
   const { title, partyLabel } = TYPE_LABELS[receipt.type]
@@ -54,26 +54,26 @@ export function printReceipt(receipt: TransactionReceipt): void {
     <meta charset="utf-8" />
     <title>Struk ${escapeHtml(receipt.transaction_code)}</title>
     <style>
-      @page { size: 4.5in 11in; margin: 0.15in 0.2in; }
+      @page { size: 9.5in 5.5in; margin: 0.2in 0.5in; }
       * { box-sizing: border-box; }
       html, body { margin: 0; padding: 0; }
       body {
         font-family: 'Courier New', Courier, monospace;
-        font-size: 9pt;
+        font-size: 11pt;
         font-weight: 700;
         color: #000;
-        width: 4.1in;
+        width: 8.5in;
       }
       .center { text-align: center; }
-      .muted { color: #444; font-size: 8pt; }
-      .store-name { font-size: 12pt; font-weight: 700; letter-spacing: 1px; }
+      .muted { color: #444; font-size: 9pt; }
+      .store-name { font-size: 15pt; font-weight: 700; letter-spacing: 1px; }
       .rule { border-top: 1px dashed #000; margin: 3px 0; }
       .rule-double { border-top: 3px double #000; margin: 3px 0; }
-      .title { font-size: 11pt; font-weight: 700; letter-spacing: 1px; margin: 3px 0; }
+      .title { font-size: 13pt; font-weight: 700; letter-spacing: 2px; margin: 3px 0; }
       .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 3px; }
       .meta-table td { padding: 0; vertical-align: top; }
-      .meta-table td.label { width: 1.15in; }
-      .meta-table td.colon { width: 0.15in; }
+      .meta-table td.label { width: 1.6in; }
+      .meta-table td.colon { width: 0.2in; }
       table.items { width: 100%; border-collapse: collapse; margin: 3px 0; }
       table.items th, table.items td {
         border-bottom: 1px solid #000;
@@ -89,7 +89,7 @@ export function printReceipt(receipt: TransactionReceipt): void {
       .totals-table tr.grand td { font-size: 13pt; font-weight: 700; border-top: 2px solid #000; padding-top: 2px; }
       .signatures { width: 100%; border-collapse: collapse; margin-top: 0.1in; page-break-inside: avoid; }
       .signatures td { text-align: center; padding-top: 0.1in; }
-      .signatures .line { border-top: 1px solid #000; margin: 0 0.15in; padding-top: 2px; }
+      .signatures .line { border-top: 1px solid #000; margin: 0 0.4in; padding-top: 2px; }
       .footer { text-align: center; margin-top: 0.08in; font-size: 9pt; page-break-inside: avoid; }
     </style>
   </head>
