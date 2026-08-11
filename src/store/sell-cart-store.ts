@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
+import type { StockCondition } from '@/lib/domain-status'
 import type { StockItemLookupResult } from '@/types/stock-item-lookup'
 
 export type SellTransactionType = 'SELL' | 'SELL_SUPPLIER'
@@ -9,12 +10,41 @@ export interface SellPartyRef {
   name: string
 }
 
-export interface SellCartLine {
+export interface SellManualProductRef {
+  id: string
+  name: string
+  sku: string
+  weight_gram: number
+}
+
+export interface SellCartScanLine {
+  kind: 'scan'
   item: StockItemLookupResult
   /** Raw digits, matching the thousands-formatted price input pattern used elsewhere. Total price for the unit, not per gram. */
   unitPrice: string
   /** True only if the item required (FE-703) and went through the BAD-condition confirm modal. */
   confirmed: boolean
+}
+
+export interface SellCartManualLine {
+  kind: 'manual'
+  /** Client-generated — the unit doesn't have a stock_item_id until checkout creates it server-side. */
+  localId: string
+  product: SellManualProductRef
+  serialNumber: string
+  condition: StockCondition
+  /** Raw digits — total cost for the unit (cogs), not per gram. */
+  costTotal: string
+  productionYear: number | null
+  /** Raw digits — total sale price for the unit, not per gram. */
+  unitPrice: string
+  confirmed: boolean
+}
+
+export type SellCartLine = SellCartScanLine | SellCartManualLine
+
+export function sellLineId(line: SellCartLine): string {
+  return line.kind === 'scan' ? line.item.id : line.localId
 }
 
 interface SellCartValues {
@@ -33,8 +63,12 @@ interface SellCartState extends SellCartValues {
   setSupplier: (supplier: SellPartyRef | null) => void
   /** Returns false (cart unchanged) if the unit is already in the cart. */
   addItem: (item: StockItemLookupResult, confirmed?: boolean) => boolean
-  removeItem: (stockItemId: string) => void
-  setUnitPrice: (stockItemId: string, value: string) => void
+  addManualItem: (
+    item: Omit<SellCartManualLine, 'kind' | 'localId' | 'unitPrice' | 'confirmed'>,
+    confirmed?: boolean,
+  ) => void
+  removeLine: (lineId: string) => void
+  setLineUnitPrice: (lineId: string, value: string) => void
   setPaymentMethod: (value: string) => void
   setPaymentRef: (value: string) => void
   setNotes: (value: string) => void
@@ -65,22 +99,29 @@ export const useSellCartStore = create<SellCartState>()(
       setCustomer: (customer) => set({ customer }),
       setSupplier: (supplier) => set({ supplier }),
       addItem: (item, confirmed = false) => {
-        if (get().lines.some((line) => line.item.id === item.id)) {
+        if (get().lines.some((line) => line.kind === 'scan' && line.item.id === item.id)) {
           return false
         }
         set((state) => ({
-          lines: [...state.lines, { item, unitPrice: '', confirmed }],
+          lines: [...state.lines, { kind: 'scan', item, unitPrice: '', confirmed }],
         }))
         return true
       },
-      removeItem: (stockItemId) =>
+      addManualItem: (item, confirmed = false) =>
         set((state) => ({
-          lines: state.lines.filter((line) => line.item.id !== stockItemId),
+          lines: [
+            ...state.lines,
+            { kind: 'manual', localId: crypto.randomUUID(), ...item, unitPrice: '', confirmed },
+          ],
         })),
-      setUnitPrice: (stockItemId, value) =>
+      removeLine: (lineId) =>
+        set((state) => ({
+          lines: state.lines.filter((line) => sellLineId(line) !== lineId),
+        })),
+      setLineUnitPrice: (lineId, value) =>
         set((state) => ({
           lines: state.lines.map((line) =>
-            line.item.id === stockItemId ? { ...line, unitPrice: value } : line,
+            sellLineId(line) === lineId ? { ...line, unitPrice: value } : line,
           ),
         })),
       setPaymentMethod: (value) => set({ paymentMethod: value }),

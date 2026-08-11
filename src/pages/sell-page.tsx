@@ -1,5 +1,5 @@
 import { useMutation } from '@tanstack/react-query'
-import { Loader2, ScanBarcode, ShoppingCart, StickyNote, Users, Wallet, X } from 'lucide-react'
+import { Loader2, Plus, ScanBarcode, ShoppingCart, StickyNote, Users, Wallet, X } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
@@ -7,6 +7,7 @@ import { DataTable } from '@/components/data-table/data-table'
 import type { DataTableColumn } from '@/components/data-table/types'
 import { OptionToggle } from '@/components/option-toggle'
 import { PartyCard } from '@/components/party-card'
+import { AddManualSellItemDialog } from '@/components/sell/add-manual-sell-item-dialog'
 import { BarcodeScanInput } from '@/components/sell/barcode-scan-input'
 import { ConfirmBadConditionDialog } from '@/components/sell/confirm-bad-condition-dialog'
 import { PickCustomerDialog } from '@/components/sell/pick-customer-dialog'
@@ -25,19 +26,37 @@ import {
 import { Textarea } from '@/components/ui/textarea'
 import { api } from '@/lib/api/client'
 import { ApiError } from '@/lib/api/error'
+import type { StockCondition } from '@/lib/domain-status'
 import { formatCurrency, formatThousands } from '@/lib/format'
 import { NON_CASH_METHODS } from '@/lib/payment-methods'
 import { showSuccessToast } from '@/lib/toast'
-import { type SellCartLine, useSellCartStore } from '@/store/sell-cart-store'
+import {
+  type SellCartLine,
+  type SellCartScanLine,
+  sellLineId,
+  useSellCartStore,
+} from '@/store/sell-cart-store'
 import type { StockItem } from '@/types/stock-item'
 import type { StockItemLookupResult } from '@/types/stock-item-lookup'
 import type { TransactionResult } from '@/types/transaction'
 
-interface CheckoutItemPayload {
+interface CheckoutScanItemPayload {
   stock_item_id: string
   price_total: number
   confirmed?: boolean
 }
+
+interface CheckoutManualItemPayload {
+  product_id: string
+  serial_number: string
+  condition: StockCondition
+  cost_total: number
+  production_year: number | null
+  price_total: number
+  confirmed?: boolean
+}
+
+type CheckoutItemPayload = CheckoutScanItemPayload | CheckoutManualItemPayload
 
 interface CheckoutPayload {
   type: 'SELL' | 'SELL_SUPPLIER'
@@ -66,8 +85,8 @@ export function SellPage() {
   const setCustomer = useSellCartStore((state) => state.setCustomer)
   const setSupplier = useSellCartStore((state) => state.setSupplier)
   const addItem = useSellCartStore((state) => state.addItem)
-  const removeItem = useSellCartStore((state) => state.removeItem)
-  const setUnitPrice = useSellCartStore((state) => state.setUnitPrice)
+  const removeLine = useSellCartStore((state) => state.removeLine)
+  const setLineUnitPrice = useSellCartStore((state) => state.setLineUnitPrice)
   const setPaymentMethod = useSellCartStore((state) => state.setPaymentMethod)
   const setPaymentRef = useSellCartStore((state) => state.setPaymentRef)
   const setNotes = useSellCartStore((state) => state.setNotes)
@@ -75,6 +94,7 @@ export function SellPage() {
 
   const [pickCustomerOpen, setPickCustomerOpen] = useState(false)
   const [pickSupplierOpen, setPickSupplierOpen] = useState(false)
+  const [manualItemOpen, setManualItemOpen] = useState(false)
   const [formError, setFormError] = useState<string | null>(null)
   const [pendingConfirmItem, setPendingConfirmItem] = useState<StockItemLookupResult | null>(
     null,
@@ -86,7 +106,12 @@ export function SellPage() {
   // "409 -> item ditandai/dihapus dari keranjang otomatis" without that
   // distinction.
   async function revalidateCartAfterError() {
-    const staleLines = useSellCartStore.getState().lines
+    // Manual lines never got a stock_item_id until checkout succeeds, so
+    // there's nothing to refetch for them — only scan lines can go stale
+    // between add-to-cart and checkout.
+    const staleLines = useSellCartStore
+      .getState()
+      .lines.filter((line): line is SellCartScanLine => line.kind === 'scan')
     const removedLabels: string[] = []
 
     await Promise.all(
@@ -94,12 +119,12 @@ export function SellPage() {
         try {
           const fresh = await api.get<StockItem>(`/stock-items/${line.item.id}`)
           if (fresh.status !== 'AVAILABLE') {
-            removeItem(line.item.id)
+            removeLine(line.item.id)
             removedLabels.push(`${line.item.product.name} (SN: ${line.item.serial_number})`)
           }
         } catch {
           // Unit no longer resolvable (e.g. deleted) — treat as unavailable too.
-          removeItem(line.item.id)
+          removeLine(line.item.id)
           removedLabels.push(`${line.item.product.name} (SN: ${line.item.serial_number})`)
         }
       }),
@@ -189,11 +214,23 @@ export function SellPage() {
       payment_method: paymentMethod,
       payment_ref: paymentRef.trim() || null,
       notes: notes.trim() || null,
-      items: lines.map((line) => ({
-        stock_item_id: line.item.id,
-        price_total: lineTotal(line),
-        ...(line.confirmed ? { confirmed: true } : {}),
-      })),
+      items: lines.map((line): CheckoutItemPayload =>
+        line.kind === 'scan'
+          ? {
+              stock_item_id: line.item.id,
+              price_total: lineTotal(line),
+              ...(line.confirmed ? { confirmed: true } : {}),
+            }
+          : {
+              product_id: line.product.id,
+              serial_number: line.serialNumber,
+              condition: line.condition,
+              cost_total: Number(line.costTotal),
+              production_year: line.productionYear,
+              price_total: lineTotal(line),
+              ...(line.confirmed ? { confirmed: true } : {}),
+            },
+      ),
     })
   }
 
@@ -203,35 +240,47 @@ export function SellPage() {
     {
       id: 'product',
       header: 'Produk',
-      cell: (line) => (
-        <div className="flex flex-col">
-          <span className="font-medium text-gray-900">{line.item.product.name}</span>
-          <span className="text-caption text-gray-500">
-            {line.item.barcode} · SN: {line.item.serial_number}
-          </span>
-        </div>
-      ),
+      cell: (line) =>
+        line.kind === 'scan' ? (
+          <div className="flex flex-col">
+            <span className="font-medium text-gray-900">{line.item.product.name}</span>
+            <span className="text-caption text-gray-500">
+              {line.item.barcode} · SN: {line.item.serial_number}
+            </span>
+          </div>
+        ) : (
+          <div className="flex flex-col">
+            <span className="font-medium text-gray-900">{line.product.name}</span>
+            <span className="text-caption text-gray-500">
+              SN: {line.serialNumber} · Input Manual
+            </span>
+          </div>
+        ),
     },
     {
       id: 'condition',
       header: 'Kondisi',
-      cell: (line) =>
-        line.item.condition === 'BAD' ? (
+      cell: (line) => {
+        const condition = line.kind === 'scan' ? line.item.condition : line.condition
+        return condition === 'BAD' ? (
           <StatusBadge tone="warning" label="BAD" />
         ) : (
           <StatusBadge tone="success" label="GOOD" />
-        ),
+        )
+      },
     },
     {
       id: 'weight',
       header: 'Berat',
-      cell: (line) => `${line.item.product.weight_gram} gr`,
+      cell: (line) =>
+        `${line.kind === 'scan' ? line.item.product.weight_gram : line.product.weight_gram} gr`,
       className: 'text-table-num',
     },
     {
       id: 'purchase_price',
       header: 'Harga Modal',
-      cell: (line) => formatCurrency(line.item.purchase_price),
+      cell: (line) =>
+        formatCurrency(line.kind === 'scan' ? line.item.purchase_price : Number(line.costTotal)),
       className: 'text-table-num',
     },
     {
@@ -245,7 +294,7 @@ export function SellPage() {
           value={formatThousands(line.unitPrice)}
           onChange={(event) => {
             const digits = event.target.value.replace(/\D/g, '')
-            setUnitPrice(line.item.id, digits)
+            setLineUnitPrice(sellLineId(line), digits)
           }}
           disabled={checkoutMutation.isPending}
           className="w-32"
@@ -266,8 +315,8 @@ export function SellPage() {
         <Button
           variant="ghost"
           size="icon-sm"
-          aria-label={`Hapus ${line.item.serial_number} dari keranjang`}
-          onClick={() => removeItem(line.item.id)}
+          aria-label={`Hapus ${line.kind === 'scan' ? line.item.serial_number : line.serialNumber} dari keranjang`}
+          onClick={() => removeLine(sellLineId(line))}
           disabled={checkoutMutation.isPending}
         >
           <X />
@@ -307,12 +356,18 @@ export function SellPage() {
                 </div>
                 <h2 className="text-h3 text-gray-900">Keranjang</h2>
               </div>
-              <Badge variant="outline">{lines.length} Item</Badge>
+              <div className="flex items-center gap-3">
+                <Badge variant="outline">{lines.length} Item</Badge>
+                <Button variant="secondary" size="sm" onClick={() => setManualItemOpen(true)}>
+                  <Plus />
+                  Tambah Item Manual
+                </Button>
+              </div>
             </div>
             <DataTable
               columns={columns}
               data={lines}
-              getRowId={(line) => line.item.id}
+              getRowId={sellLineId}
               emptyTitle="Keranjang kosong"
               emptyDescription="Scan barcode unit untuk mulai."
             />
@@ -492,6 +547,7 @@ export function SellPage() {
         onConfirm={handleConfirmBadCondition}
         onCancel={handleCancelBadCondition}
       />
+      <AddManualSellItemDialog open={manualItemOpen} onOpenChange={setManualItemOpen} type={type} />
     </div>
   )
 }
