@@ -2,6 +2,7 @@ import {
   ClipboardCheck,
   ClipboardList,
   FileBarChart,
+  History,
   LayoutDashboard,
   type LucideIcon,
   Package,
@@ -61,7 +62,21 @@ export const NAV_SECTIONS: NavSection[] = [
     label: 'Transaksi',
     items: [
       { type: 'link', title: 'Penjualan', url: '/sell', icon: ShoppingCart, roles: ALL_ROLES },
+      {
+        type: 'link',
+        title: 'Riwayat Penjualan',
+        url: '/sell/history',
+        icon: Receipt,
+        roles: ALL_ROLES,
+      },
       { type: 'link', title: 'Buyback', url: '/buyback', icon: RefreshCw, roles: ALL_ROLES },
+      {
+        type: 'link',
+        title: 'Riwayat Buyback',
+        url: '/buyback/history',
+        icon: History,
+        roles: ALL_ROLES,
+      },
     ],
   },
   {

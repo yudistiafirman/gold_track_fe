@@ -6,6 +6,7 @@ import { RootLayout } from '@/app/root-layout'
 import { AppLayout } from '@/components/layout/app-layout'
 import { ADMIN_ROLES, SUPER_ADMIN_ROLES } from '@/config/nav'
 import { BalanceAccountsPage } from '@/pages/balance-accounts-page'
+import { BuybackHistoryPage } from '@/pages/buyback-history-page'
 import { BuybackPage } from '@/pages/buyback-page'
 import { CreatePurchaseOrderPage } from '@/pages/create-purchase-order-page'
 import { CustomerDetailPage } from '@/pages/customer-detail-page'
@@ -30,6 +31,7 @@ import { ProductsPage } from '@/pages/products-page'
 import { PurchaseOrderDetailPage } from '@/pages/purchase-order-detail-page'
 import { PurchaseOrdersPage } from '@/pages/purchase-orders-page'
 import { ReceivePurchaseOrderPage } from '@/pages/receive-purchase-order-page'
+import { SalesHistoryPage } from '@/pages/sales-history-page'
 import { ScanOpnamePage } from '@/pages/scan-opname-page'
 import { SellPage } from '@/pages/sell-page'
 import { SettingsPage } from '@/pages/settings-page'
@@ -58,7 +60,9 @@ export const router = createBrowserRouter([
               { index: true, element: <IndexRedirect /> },
               { path: 'design-system', element: <DesignSystemPage /> },
               { path: 'sell', element: <SellPage /> },
+              { path: 'sell/history', element: <SalesHistoryPage /> },
               { path: 'buyback', element: <BuybackPage /> },
+              { path: 'buyback/history', element: <BuybackHistoryPage /> },
               {
                 path: 'products',
                 element: <ProductsLayout />,
