@@ -16,7 +16,7 @@ export function NotScannedBreakdownDialog({
 }: NotScannedBreakdownDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="flex max-h-[85vh] flex-col sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Rincian Belum Discan</DialogTitle>
           <DialogDescription>
@@ -24,13 +24,13 @@ export function NotScannedBreakdownDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-4 overflow-y-auto">
           <div className="flex flex-col gap-1.5">
             <h3 className="text-caption font-medium text-gray-500">Per Gramasi</h3>
             {byWeight.length === 0 ? (
               <p className="py-2 text-center text-caption text-gray-500">Tidak ada data.</p>
             ) : (
-              <div className="flex flex-col divide-y divide-border rounded-lg border border-border">
+              <div className="flex max-h-40 flex-col divide-y divide-border overflow-y-auto rounded-lg border border-border">
                 {byWeight.map((group) => (
                   <div
                     key={group.weight_gram}
