@@ -5,6 +5,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import { toast } from 'sonner'
 import { ConfirmDialog } from '@/components/confirm-dialog'
 import { StatusBadge } from '@/components/status-badge'
+import { NotScannedBreakdownDialog } from '@/components/stock-opnames/not-scanned-breakdown-dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -14,7 +15,13 @@ import { networkRetryDelay, retryOnNetworkError } from '@/lib/api/retry'
 import { OPNAME_RESULT_TONE, OPNAME_SESSION_STATUS_TONE, resolveStatusTone } from '@/lib/domain-status'
 import { focusAfterPaint } from '@/lib/focus-after-paint'
 import { NotFoundPage } from '@/pages/not-found-page'
-import type { ScanOpnameResult, StockOpname, StockOpnameDetail } from '@/types/stock-opname'
+import type {
+  NotScannedItem,
+  NotScannedWeightGroup,
+  ScanOpnameResult,
+  StockOpname,
+  StockOpnameDetail,
+} from '@/types/stock-opname'
 
 interface ScanFeedEntry extends Omit<ScanOpnameResult, 'not_scanned'> {
   key: string
@@ -34,8 +41,13 @@ export function ScanOpnamePage() {
   const [barcode, setBarcode] = useState('')
   const [feed, setFeed] = useState<ScanFeedEntry[]>([])
   const [counts, setCounts] = useState({ match: 0, unexpected: 0, notScanned: 0 })
+  const [notScannedDetail, setNotScannedDetail] = useState<{
+    items: NotScannedItem[]
+    byWeight: NotScannedWeightGroup[]
+  }>({ items: [], byWeight: [] })
   const [seeded, setSeeded] = useState(false)
   const [showCompleteConfirm, setShowCompleteConfirm] = useState(false)
+  const [showNotScannedBreakdown, setShowNotScannedBreakdown] = useState(false)
 
   const opnameQuery = useQuery({
     queryKey: ['stock-opnames', id],
@@ -52,6 +64,10 @@ export function ScanOpnamePage() {
       match: opname.summary.match,
       unexpected: opname.summary.unexpected,
       notScanned: opname.summary.not_scanned,
+    })
+    setNotScannedDetail({
+      items: opname.not_scanned_items ?? [],
+      byWeight: opname.not_scanned_by_weight ?? [],
     })
     // Resuming an in-progress session: BE now includes items[] for
     // IN_PROGRESS too (not just COMPLETED), so re-populate the scan feed
@@ -96,6 +112,10 @@ export function ScanOpnamePage() {
         unexpected: prev.unexpected + (result.result === 'UNEXPECTED' ? 1 : 0),
         notScanned: result.not_scanned,
       }))
+      setNotScannedDetail({
+        items: result.not_scanned_items ?? [],
+        byWeight: result.not_scanned_by_weight ?? [],
+      })
       setBarcode('')
       focusAfterPaint(() => inputRef.current?.focus())
     },
@@ -219,7 +239,12 @@ export function ScanOpnamePage() {
             <ScanBarcode className="size-5 text-warning" />
           </div>
         </div>
-        <div className="flex items-center justify-between rounded-xl border border-border bg-card p-4 shadow-card">
+        <button
+          type="button"
+          onClick={() => setShowNotScannedBreakdown(true)}
+          disabled={counts.notScanned === 0}
+          className="flex items-center justify-between rounded-xl border border-border bg-card p-4 text-left shadow-card transition-colors enabled:hover:bg-gray-50 disabled:cursor-default"
+        >
           <div>
             <p className="text-caption text-gray-500">Belum Discan</p>
             <p className="text-h2 tabular-nums text-gray-900">
@@ -229,7 +254,7 @@ export function ScanOpnamePage() {
           <div className="flex size-11 items-center justify-center rounded-full bg-gray-100">
             <ScanBarcode className="size-5 text-gray-400" />
           </div>
-        </div>
+        </button>
       </div>
 
       <form onSubmit={handleSubmit} className="flex gap-2 rounded-xl border border-primary/20 bg-card p-4 shadow-card">
@@ -316,6 +341,13 @@ export function ScanOpnamePage() {
           setShowCompleteConfirm(false)
           completeMutation.mutate()
         }}
+      />
+
+      <NotScannedBreakdownDialog
+        open={showNotScannedBreakdown}
+        onOpenChange={setShowNotScannedBreakdown}
+        items={notScannedDetail.items}
+        byWeight={notScannedDetail.byWeight}
       />
     </div>
   )
