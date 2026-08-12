@@ -1,4 +1,4 @@
-import { ADMIN_ROLES } from '@/config/nav'
+import { ADMIN_ROLES, SUPER_ADMIN_ROLES } from '@/config/nav'
 import { useCurrentRole } from '@/store/auth-store'
 import type { Role } from '@/types/role'
 
@@ -16,6 +16,9 @@ export type Action = 'create' | 'update' | 'delete'
 const RESOURCE_OVERRIDES: Partial<Record<string, Partial<Record<Action, Role[]>>>> = {
   customers: {
     create: ['ADMIN', 'KASIR', 'SUPER_ADMIN'],
+  },
+  'stock-items': {
+    delete: SUPER_ADMIN_ROLES,
   },
 }
 
