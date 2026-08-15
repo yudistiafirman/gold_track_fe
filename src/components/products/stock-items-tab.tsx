@@ -1,8 +1,9 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
-import { Boxes, Eye, Loader2, Pencil, Printer, Trash2 } from 'lucide-react'
+import { Boxes, Eye, Loader2, Pencil, Plus, Printer, Trash2 } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { DataTable } from '@/components/data-table/data-table'
 import type { DataTableColumn, PaginationMeta } from '@/components/data-table/types'
+import { CreateStockItemDialog } from '@/components/products/create-stock-item-dialog'
 import { DeleteStockItemDialog } from '@/components/products/delete-stock-item-dialog'
 import { EditStockItemDialog } from '@/components/products/edit-stock-item-dialog'
 import { StockItemDetailDialog } from '@/components/products/stock-item-detail-dialog'
@@ -68,8 +69,10 @@ export function StockItemsTab({ productId }: StockItemsTabProps) {
     serialNumber: string
     productId: string
   } | null>(null)
+  const [createOpen, setCreateOpen] = useState(false)
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
   const debouncedSearch = useDebouncedValue(search, 400)
+  const canCreate = useCan('create', 'stock-items')
   const canUpdate = useCan('update', 'stock-items')
   const canDelete = useCan('delete', 'stock-items')
   const printLabelMutation = usePrintStockItemLabel()
@@ -286,6 +289,12 @@ export function StockItemsTab({ productId }: StockItemsTabProps) {
                   Cetak Label Terpilih ({selectedIds.size})
                 </Button>
               )}
+              {canCreate && (
+                <Button onClick={() => setCreateOpen(true)}>
+                  <Plus />
+                  Tambah Unit Stok
+                </Button>
+              )}
             </div>
           </div>
         }
@@ -302,6 +311,7 @@ export function StockItemsTab({ productId }: StockItemsTabProps) {
         stockItem={deletingStockItem}
         onClose={() => setDeletingStockItem(null)}
       />
+      <CreateStockItemDialog productId={productId} open={createOpen} onOpenChange={setCreateOpen} />
     </div>
   )
 }
