@@ -35,6 +35,7 @@ import { SalesHistoryPage } from '@/pages/sales-history-page'
 import { ScanOpnamePage } from '@/pages/scan-opname-page'
 import { SellPage } from '@/pages/sell-page'
 import { SettingsPage } from '@/pages/settings-page'
+import { SoldStockItemsPage } from '@/pages/sold-stock-items-page'
 import { StartOpnamePage } from '@/pages/start-opname-page'
 import { StockOpnamesPage } from '@/pages/stock-opnames-page'
 import { StockReportPage } from '@/pages/stock-report-page'
@@ -77,6 +78,7 @@ export const router = createBrowserRouter([
                   },
                 ],
               },
+              { path: 'products/sold', element: <SoldStockItemsPage /> },
               { path: 'products/:id', element: <ProductDetailPage /> },
               { path: 'customers', element: <CustomersPage /> },
               { path: 'customers/:id', element: <CustomerDetailPage /> },

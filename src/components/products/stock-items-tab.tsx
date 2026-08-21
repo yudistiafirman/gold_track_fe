@@ -24,12 +24,7 @@ import {
 } from '@/hooks/use-print-stock-item-label'
 import { api } from '@/lib/api/client'
 import { ApiError } from '@/lib/api/error'
-import {
-  STOCK_CONDITION_TONE,
-  STOCK_STATUS_TONE,
-  type StockCondition,
-  type StockStatus,
-} from '@/lib/domain-status'
+import { STOCK_CONDITION_TONE, STOCK_STATUS_TONE, type StockCondition } from '@/lib/domain-status'
 import { formatCurrency, formatDate } from '@/lib/format'
 import { useCan } from '@/lib/permissions'
 import type { StockItem } from '@/types/stock-item'
@@ -40,12 +35,6 @@ interface StockItemListResponse {
 }
 
 const PAGE_SIZE = 10
-
-const STATUS_OPTIONS: { value: StockStatus | 'ALL'; label: string }[] = [
-  { value: 'ALL', label: 'Semua status' },
-  { value: 'AVAILABLE', label: 'Available' },
-  { value: 'SOLD', label: 'Sold' },
-]
 
 const CONDITION_OPTIONS: { value: StockCondition | 'ALL'; label: string }[] = [
   { value: 'ALL', label: 'Semua kondisi' },
@@ -59,7 +48,6 @@ interface StockItemsTabProps {
 
 export function StockItemsTab({ productId }: StockItemsTabProps) {
   const [search, setSearch] = useState('')
-  const [status, setStatus] = useState<StockStatus | 'ALL'>('ALL')
   const [condition, setCondition] = useState<StockCondition | 'ALL'>('ALL')
   const [page, setPage] = useState(1)
   const [viewingStockItemId, setViewingStockItemId] = useState<string | null>(null)
@@ -83,13 +71,12 @@ export function StockItemsTab({ productId }: StockItemsTabProps) {
       'products',
       productId,
       'stock-items',
-      { search: debouncedSearch, status, condition, page },
+      { search: debouncedSearch, condition, page },
     ],
     queryFn: () =>
       api.get<StockItemListResponse>(`/products/${productId}/stock-items`, {
         params: {
           search: debouncedSearch || undefined,
-          status: status === 'ALL' ? undefined : status,
           condition: condition === 'ALL' ? undefined : condition,
           page,
           limit: PAGE_SIZE,
@@ -233,25 +220,6 @@ export function StockItemsTab({ productId }: StockItemsTabProps) {
         onSelectedIdsChange={setSelectedIds}
         filters={
           <div className="flex flex-wrap items-center gap-2">
-            <Select
-              value={status}
-              onValueChange={(value) => {
-                setStatus(value as StockStatus | 'ALL')
-                setPage(1)
-              }}
-            >
-              <SelectTrigger className="w-40">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {STATUS_OPTIONS.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
             <Select
               value={condition}
               onValueChange={(value) => {

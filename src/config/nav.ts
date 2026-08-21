@@ -6,6 +6,7 @@ import {
   LayoutDashboard,
   type LucideIcon,
   Package,
+  PackageCheck,
   Receipt,
   RefreshCw,
   ShoppingCart,
@@ -83,6 +84,13 @@ export const NAV_SECTIONS: NavSection[] = [
     label: 'Master Data',
     items: [
       { type: 'link', title: 'Produk', url: '/products', icon: Package, roles: ALL_ROLES },
+      {
+        type: 'link',
+        title: 'Barang Terjual',
+        url: '/products/sold',
+        icon: PackageCheck,
+        roles: ALL_ROLES,
+      },
       { type: 'link', title: 'Pelanggan', url: '/customers', icon: Users, roles: ALL_ROLES },
       { type: 'link', title: 'Supplier', url: '/suppliers', icon: Truck, roles: ADMIN_ROLES },
     ],
