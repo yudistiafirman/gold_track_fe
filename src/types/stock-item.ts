@@ -14,6 +14,8 @@ export interface StockItem {
   production_year: number | null
   status: StockStatus
   sold_at: string | null
+  /** Absent (not null) when the unit hasn't been sold. */
+  sold_to?: { type: 'CUSTOMER' | 'SUPPLIER'; id: string; name: string }
   notes: string | null
   created_at: string
   updated_at: string

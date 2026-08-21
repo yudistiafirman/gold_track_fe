@@ -96,6 +96,22 @@ export function SoldStockItemsPage() {
         header: 'Tanggal Terjual',
         cell: (row) => (row.sold_at ? formatDate(row.sold_at) : '—'),
       },
+      {
+        id: 'sold_to',
+        header: 'Terjual ke',
+        cell: (row) =>
+          row.sold_to ? (
+            <div className="flex items-center gap-2">
+              <span className="text-gray-900">{row.sold_to.name}</span>
+              <StatusBadge
+                tone={row.sold_to.type === 'CUSTOMER' ? 'success' : 'warning'}
+                label={row.sold_to.type === 'CUSTOMER' ? 'Pelanggan' : 'Supplier'}
+              />
+            </div>
+          ) : (
+            '—'
+          ),
+      },
     ],
     [],
   )
