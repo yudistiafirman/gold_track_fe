@@ -142,6 +142,12 @@ export function TransactionReceiptPage() {
                   <TableHead>Produk</TableHead>
                   <TableHead>Berat</TableHead>
                   <TableHead>Subtotal</TableHead>
+                  {receipt.items[0]?.cost_price !== undefined && (
+                    <>
+                      <TableHead>Harga Modal</TableHead>
+                      <TableHead>Profit</TableHead>
+                    </>
+                  )}
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -159,6 +165,16 @@ export function TransactionReceiptPage() {
                     <TableCell className="text-table-num">
                       {formatCurrency(item.price_total)}
                     </TableCell>
+                    {item.cost_price !== undefined && (
+                      <TableCell className="text-table-num">
+                        {formatCurrency(item.cost_price)}
+                      </TableCell>
+                    )}
+                    {item.profit !== undefined && (
+                      <TableCell className="text-table-num">
+                        {formatCurrency(item.profit)}
+                      </TableCell>
+                    )}
                   </TableRow>
                 ))}
               </TableBody>
@@ -178,6 +194,12 @@ export function TransactionReceiptPage() {
               <span>Total Bayar</span>
               <span className="text-primary">{formatCurrency(receipt.total_amount)}</span>
             </div>
+            {receipt.total_profit !== undefined && (
+              <div className="flex w-full max-w-xs justify-between text-body text-gray-500">
+                <span>Total Profit</span>
+                <span>{formatCurrency(receipt.total_profit)}</span>
+              </div>
+            )}
           </div>
         </div>
       )}

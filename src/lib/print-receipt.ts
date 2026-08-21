@@ -29,6 +29,12 @@ function resolveParty(receipt: TransactionReceipt) {
  * prints cleanly and fast. The OS printer driver still needs the
  * continuous-form stock (and a matching 9.5x5.5in custom paper size)
  * configured — this only controls what the browser sends to print.
+ *
+ * Guard: `TransactionReceipt`/`ReceiptItem` carry optional margin fields
+ * (cost_price, profit, total_profit) shown on-screen to ADMIN/SUPER_ADMIN
+ * (see transaction-receipt-page.tsx). Do NOT add them to the printed
+ * template below — the printed receipt is handed to the customer and must
+ * never expose cost/margin data, regardless of who clicks print.
  */
 export function printReceipt(receipt: TransactionReceipt): void {
   const { title, partyLabel } = TYPE_LABELS[receipt.type]

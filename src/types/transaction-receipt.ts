@@ -15,6 +15,10 @@ export interface ReceiptItem {
   weight_gram: number
   price_per_gram: number
   price_total: number
+  /** ADMIN/SUPER_ADMIN + SELL/SELL_SUPPLIER only — omitted otherwise, never null. */
+  cost_price?: number
+  /** ADMIN/SUPER_ADMIN + SELL/SELL_SUPPLIER only — omitted otherwise, never null. */
+  profit?: number
 }
 
 export interface ReceiptParty {
@@ -52,4 +56,6 @@ export interface TransactionReceipt {
   store: ReceiptStore
   invoice_url: string | null
   items: ReceiptItem[]
+  /** ADMIN/SUPER_ADMIN + SELL/SELL_SUPPLIER only — omitted otherwise, never null. */
+  total_profit?: number
 }
