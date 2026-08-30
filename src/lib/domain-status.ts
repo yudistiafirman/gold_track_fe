@@ -51,6 +51,12 @@ export const ACCOUNT_STATUS_TONE = {
   NONAKTIF: 'gray',
 } as const satisfies Record<string, StatusTone>
 
+/** Reconciliation `in_sync` flag → badge tone. Keyed by the stringified boolean. */
+export const RECONCILIATION_TONE = {
+  true: 'success',
+  false: 'error',
+} as const satisfies Record<string, StatusTone>
+
 export const LOW_STOCK_TONE: StatusTone = 'error'
 
 export type PoStatus = keyof typeof PO_STATUS_TONE

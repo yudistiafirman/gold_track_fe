@@ -133,6 +133,7 @@ export const NAV_SECTIONS: NavSection[] = [
           { title: 'Transaksi', url: '/reports/transactions' },
           { title: 'Stok', url: '/reports/stock' },
           { title: 'Keuangan', url: '/reports/finance' },
+          { title: 'Rekonsiliasi', url: '/reports/reconciliation' },
         ],
       },
       {
@@ -144,6 +145,7 @@ export const NAV_SECTIONS: NavSection[] = [
           { title: 'Saldo Uang', url: '/balance-accounts' },
           { title: 'Uang Diluar', url: '/external-funds' },
           { title: 'Hutang Diluar', url: '/external-debts' },
+          { title: 'Tutup Buku', url: '/daily-closings' },
         ],
       },
     ],

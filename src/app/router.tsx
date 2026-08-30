@@ -11,6 +11,7 @@ import { BuybackPage } from '@/pages/buyback-page'
 import { CreatePurchaseOrderPage } from '@/pages/create-purchase-order-page'
 import { CustomerDetailPage } from '@/pages/customer-detail-page'
 import { CustomersPage } from '@/pages/customers-page'
+import { DailyClosingsPage } from '@/pages/daily-closings-page'
 import { DashboardPage } from '@/pages/dashboard-page'
 import { DesignSystemPage } from '@/pages/design-system-page'
 import { ExpenseCategoriesPage } from '@/pages/expense-categories-page'
@@ -31,6 +32,7 @@ import { ProductsPage } from '@/pages/products-page'
 import { PurchaseOrderDetailPage } from '@/pages/purchase-order-detail-page'
 import { PurchaseOrdersPage } from '@/pages/purchase-orders-page'
 import { ReceivePurchaseOrderPage } from '@/pages/receive-purchase-order-page'
+import { ReconciliationReportPage } from '@/pages/reconciliation-report-page'
 import { SalesHistoryPage } from '@/pages/sales-history-page'
 import { ScanOpnamePage } from '@/pages/scan-opname-page'
 import { SellPage } from '@/pages/sell-page'
@@ -117,6 +119,8 @@ export const router = createBrowserRouter([
                   { path: 'reports/transactions', element: <TransactionsReportPage /> },
                   { path: 'reports/stock', element: <StockReportPage /> },
                   { path: 'reports/finance', element: <FinanceReportPage /> },
+                  { path: 'reports/reconciliation', element: <ReconciliationReportPage /> },
+                  { path: 'daily-closings', element: <DailyClosingsPage /> },
                   { path: 'users', element: <UsersPage /> },
                   { path: 'balance-accounts', element: <BalanceAccountsPage /> },
                   { path: 'external-funds', element: <ExternalFundsPage /> },
